@@ -1,0 +1,790 @@
+{
+  "pages": 19,
+  "readablePages": 19,
+  "pagesWithTitleBlockText": 19,
+  "pageResults": [
+    {
+      "page": 1,
+      "textItems": 535,
+      "titleBlockItems": 245,
+      "sheetCandidates": [
+        "A00.01",
+        "SD3",
+        "A00.04",
+        "A00.11",
+        "A00.12",
+        "A01.01",
+        "A01.02",
+        "A01.03",
+        "A01.11",
+        "A02.01",
+        "A02.03",
+        "A02.04",
+        "A02.05",
+        "A02.06",
+        "A02.07",
+        "IN100",
+        "A02.08",
+        "A04.01",
+        "A04.02",
+        "TO5",
+        "TO40",
+        "D4",
+        "OF20",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06"
+      ],
+      "selectedSheet": "A00.01",
+      "candidateLines": [
+        {
+          "text": "A00.01 cover sheet SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.626
+        },
+        {
+          "text": "A00.04 perspectives SD3 30/03/26 unit 27 type D - 2 bed GOLD 65.64 10.88",
+          "xRatio": 0.603,
+          "yRatio": 0.637
+        },
+        {
+          "text": "A00.11 yeild information data - fe... SD3 30/03/26 unit 28 type E - 2 bed GOLD 66.04 10.05",
+          "xRatio": 0.603,
+          "yRatio": 0.646
+        },
+        {
+          "text": "A00.12 private open spaces diagr... SD3 30/03/26 fifth floor fifth floor",
+          "xRatio": 0.603,
+          "yRatio": 0.656
+        },
+        {
+          "text": "A01.01 survey SD3 30/03/26 unit 29 type A - 3 bed GOLD 95.00 13.76",
+          "xRatio": 0.603,
+          "yRatio": 0.666
+        },
+        {
+          "text": "A01.02 site plan SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.677
+        },
+        {
+          "text": "A01.03 demolition plan SD3 30/03/26 unit 32 type C - 1 bed GOLD 45.22 10.90",
+          "xRatio": 0.603,
+          "yRatio": 0.688
+        },
+        {
+          "text": "A01.11 site circulation & fire egre... SD3 30/03/26 unit 33 type C - 1 bed GOLD 45.21 10.54",
+          "xRatio": 0.603,
+          "yRatio": 0.697
+        },
+        {
+          "text": "A02.01 ground floor plan SD3 30/03/26 unit 34 type D - 2 bed GOLD 65.64 10.88",
+          "xRatio": 0.603,
+          "yRatio": 0.706
+        },
+        {
+          "text": "tramore st A02.02 first floor plan SD3 30/03/26 unit 35 type E - 2 bed GOLD 66.04 10.05",
+          "xRatio": 0.165,
+          "yRatio": 0.715
+        },
+        {
+          "text": "A02.03 second- fifth floor plan SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.727
+        },
+        {
+          "text": "A02.04 roof plan SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.737
+        },
+        {
+          "text": "A02.05 unit layout 1 SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.747
+        },
+        {
+          "text": "A02.06 unit layout 2 SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.757
+        },
+        {
+          "text": "A02.07 partition & finishes plan SD3 30/03/26 all building work to comply with NCC 2022 as adopted in 100",
+          "xRatio": 0.603,
+          "yRatio": 0.767
+        },
+        {
+          "text": "A02.08 reflected ceiling plans SD3 30/03/26 including current amendments.",
+          "xRatio": 0.603,
+          "yRatio": 0.778
+        },
+        {
+          "text": "A04.01 elevations 1 SD3 30/03/26",
+          "xRatio": 0.603,
+          "yRatio": 0.788
+        },
+        {
+          "text": "A04.02 elevations 2 SD3 30/03/26 consultant drawings, specifications and reports.",
+          "xRatio": 0.603,
+          "yRatio": 0.798
+        },
+        {
+          "text": "clause performance caluse A05.01 sections SD3 30/03/26",
+          "xRatio": 0.128,
+          "yRatio": 0.808
+        },
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE cover sheet 95309/SD/A00.01 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "D E V E L O P M E N T O V E R V I E W D E V E L O P M E N T O V E R V I E W 500 4 B A Y N E S S T R E E T , M A R G A T E Qbuild project number: 95309 unit summ",
+      "titleBlockSample": "unit 25 type C - 1 bed GOLD 45.22 10.90 A00.01 cover sheet SD3 30/03/26 unit 26 type C - 1 bed GOLD 45.21 10.54"
+    },
+    {
+      "page": 2,
+      "textItems": 96,
+      "titleBlockItems": 89,
+      "sheetCandidates": [
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A00.04"
+      ],
+      "selectedSheet": "A00.04",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE perspectives 95309/SD/A00.04 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "500 450 400 350 300 250 200 150",
+      "titleBlockSample": "150 100 50 This drawing is schematic only for tendering purposes, is subject to further design development, and not for construction AT SCALE DRAWINGS INDEXING SYSTEM AMENDMENTS level 1, 54 jephson st FOR QBUILD USE ONLY"
+    },
+    {
+      "page": 3,
+      "textItems": 210,
+      "titleBlockItems": 113,
+      "sheetCandidates": [
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A00.11"
+      ],
+      "selectedSheet": "A00.11",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE yeild information data - feca, ueca, gfa & site cover 95309/SD/A00.11 S",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "site cover 2 823.61 m 500 10 11 1 2",
+      "titleBlockSample": "deep planting 2,410 1,500 B A Y N E S 150 4 UCA & FECA - typical upper floor (level 1-5) - SCALE: 1:200@A1 100 third floor third floor"
+    },
+    {
+      "page": 4,
+      "textItems": 362,
+      "titleBlockItems": 89,
+      "sheetCandidates": [
+        "A1",
+        "LB30",
+        "AU4",
+        "IS35",
+        "SD3",
+        "SD2",
+        "SD1",
+        "B27",
+        "A00.12"
+      ],
+      "selectedSheet": "A00.12",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-B 27/02/26 issue for SD1 submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE private open spaces diagrams 95309/SD/A00.12 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "private outdoor area balcony unit area (m²) first floor unit 1 13.76 unit 2",
+      "titleBlockSample": "150 100 - SCALE: 1:200@A1 50 N This drawing is schematic only for tendering purposes, is subject to further design development, and not for construction AT SCALE DRAWINGS INDEXING SYSTEM"
+    },
+    {
+      "page": 5,
+      "textItems": 22,
+      "titleBlockItems": 8,
+      "sheetCandidates": [
+        "RL9.94M",
+        "LOT2"
+      ],
+      "selectedSheet": "",
+      "candidateLines": [],
+      "sample": "24 DISRAELI STREET 3 1 Refer to the site plan and floor plans for the true north point, as shown in the Moreton Bay City Council’s interactive",
+      "titleBlockSample": "Bench Mark Screw in Kerb RL 9.94m (AHD Derived) BAYNES STREET RESIDENTIAL SITE PLAN 4 Baynes Street, Margate (LOT 2 & 4 ON RP56405)"
+    },
+    {
+      "page": 6,
+      "textItems": 344,
+      "titleBlockItems": 127,
+      "sheetCandidates": [
+        "FOR0",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A01.02"
+      ],
+      "selectedSheet": "A01.02",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE site plan 95309/SD/A01.02 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "general notes Construction to be 'TYPE A FIRE RESISTING CONSTRUCTION' in accordance with NCC 2022 1. All construction is to be carried multi level rendered unit",
+      "titleBlockSample": "accordance with AS 3660.1. 19. Smoke detectors to be installed to comply with AS 1603.2 20. Insulation to comply with BCA Energy Efficiency Requirements. 21. CCTV and roller shutter door access details refer to electrica"
+    },
+    {
+      "page": 7,
+      "textItems": 234,
+      "titleBlockItems": 111,
+      "sheetCandidates": [
+        "THE50",
+        "FOR0",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A01.03"
+      ],
+      "selectedSheet": "A01.03",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE demolition plan 95309/SD/A01.03 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "line legend sewer SW electrical water W multi level rendered units multi level rendered units",
+      "titleBlockSample": "Install a new fence to all boundaries and inspect the condition of the remaining boundary fences. Builder must obtain approval from the neighbour prior to 150 demolishing existing fencing. 100 50 Install a new fence to a"
+    },
+    {
+      "page": 8,
+      "textItems": 209,
+      "titleBlockItems": 88,
+      "sheetCandidates": [
+        "LB30",
+        "A1",
+        "AU4",
+        "IS35",
+        "SD3",
+        "SD2",
+        "SD1",
+        "B27",
+        "A01.11"
+      ],
+      "selectedSheet": "A01.11",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-B 27/02/26 issue for SD1 submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE site circulation & fire egress plan 95309/SD/A01.11 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "legend direction of access egress path of travel entry Distance 25.95m 500 12 13",
+      "titleBlockSample": "FFL +13.610 150 100 50 This drawing is schematic only for tendering purposes, is subject to further design development, and not for construction AT SCALE DRAWINGS INDEXING SYSTEM AMENDMENTS"
+    },
+    {
+      "page": 9,
+      "textItems": 652,
+      "titleBlockItems": 175,
+      "sheetCandidates": [
+        "A05.01",
+        "HR1",
+        "HR2",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.01"
+      ],
+      "selectedSheet": "A02.01",
+      "candidateLines": [
+        {
+          "text": "A05.01",
+          "xRatio": 0.411,
+          "yRatio": 0.059
+        },
+        {
+          "text": "existing and proposed screen to boundary roof over TOW 10.000 line of floor over A02.11 3,000 of influence",
+          "xRatio": 0.049,
+          "yRatio": 0.19
+        },
+        {
+          "text": "A02.11 +9.925 fall 190 fall +10.000 highset timber house",
+          "xRatio": 0.081,
+          "yRatio": 0.346
+        },
+        {
+          "text": "12.5m A05.01 B A05.01",
+          "xRatio": 0.059,
+          "yRatio": 0.41
+        },
+        {
+          "text": "A02.12 300",
+          "xRatio": 0.891,
+          "yRatio": 0.429
+        },
+        {
+          "text": "3,000 A02.12 45.92 m 2",
+          "xRatio": 0.168,
+          "yRatio": 0.552
+        },
+        {
+          "text": "A05.01 DP downpipe",
+          "xRatio": 0.411,
+          "yRatio": 0.645
+        },
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE ground floor plan 95309/SD/A02.01 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "1 A05.01 A B C D E F",
+      "titleBlockSample": "DB distribution board to electrical engineer's specification 1 A05.01 DP downpipe ELE electrical FHR fire hose reel to hydraulic"
+    },
+    {
+      "page": 10,
+      "textItems": 680,
+      "titleBlockItems": 204,
+      "sheetCandidates": [
+        "A05.01",
+        "HR1",
+        "HR2",
+        "IS10.02",
+        "FOR76.83",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.02"
+      ],
+      "selectedSheet": "A02.02",
+      "candidateLines": [
+        {
+          "text": "A05.01",
+          "xRatio": 0.411,
+          "yRatio": 0.059
+        },
+        {
+          "text": "A02.11",
+          "xRatio": 0.562,
+          "yRatio": 0.19
+        },
+        {
+          "text": "A02.11 4,350",
+          "xRatio": 0.081,
+          "yRatio": 0.345
+        },
+        {
+          "text": "2 bed GOLD bed GOLD bed GOLD unit 6 A05.01 2",
+          "xRatio": 0.085,
+          "yRatio": 0.406
+        },
+        {
+          "text": "A05.01",
+          "xRatio": 0.081,
+          "yRatio": 0.41
+        },
+        {
+          "text": "BAL1 A02.12 300",
+          "xRatio": 0.81,
+          "yRatio": 0.429
+        },
+        {
+          "text": "9,706 190 10,311 382 6,548 A02.12 270 6,550 270 6,549 lightweight awning over carpark 382 10,419 190 legend",
+          "xRatio": 0.204,
+          "yRatio": 0.555
+        },
+        {
+          "text": "A05.01 DB distribution board to",
+          "xRatio": 0.411,
+          "yRatio": 0.644
+        },
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE first floor plan 95309/SD/A02.02 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "1 A05.01 A A B B C C",
+      "titleBlockSample": "structural engineer's details CL clothes line COMM communication 1 DB distribution board to A05.01 electrical engineer's specification DP downpipe"
+    },
+    {
+      "page": 11,
+      "textItems": 590,
+      "titleBlockItems": 206,
+      "sheetCandidates": [
+        "COL2",
+        "X190",
+        "A05.01",
+        "HR1",
+        "HR2",
+        "IS10.93",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.03"
+      ],
+      "selectedSheet": "A02.03",
+      "candidateLines": [
+        {
+          "text": "A05.01",
+          "xRatio": 0.411,
+          "yRatio": 0.059
+        },
+        {
+          "text": "A02.11",
+          "xRatio": 0.562,
+          "yRatio": 0.19
+        },
+        {
+          "text": "A02.11 4,350",
+          "xRatio": 0.081,
+          "yRatio": 0.345
+        },
+        {
+          "text": "2 bed GOLD bed GOLD bed GOLD unit 13 A05.01 2",
+          "xRatio": 0.085,
+          "yRatio": 0.406
+        },
+        {
+          "text": "A05.01",
+          "xRatio": 0.081,
+          "yRatio": 0.41
+        },
+        {
+          "text": "BAL1 A02.12 300",
+          "xRatio": 0.81,
+          "yRatio": 0.429
+        },
+        {
+          "text": "A02.12",
+          "xRatio": 0.455,
+          "yRatio": 0.552
+        },
+        {
+          "text": "A05.01",
+          "xRatio": 0.411,
+          "yRatio": 0.644
+        },
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE second- fifth floor plan 95309/SD/A02.03 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "A05.01 A B C D E F G",
+      "titleBlockSample": "COL2 790 x 190 BLK column to structural engineer's details CL clothes line 1 COMM communication A05.01 DB distribution board to electrical engineer's specification"
+    },
+    {
+      "page": 12,
+      "textItems": 186,
+      "titleBlockItems": 95,
+      "sheetCandidates": [
+        "FOR0",
+        "LB30",
+        "A1",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.04"
+      ],
+      "selectedSheet": "A02.04",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE roof plan 95309/SD/A02.04 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "legend BC barge capping DP downpipes EG eaves gutter MRS",
+      "titleBlockSample": "150 100 50 N This drawing is schematic only for tendering purposes, is subject to further design development, and not for 0 1m 2m 5m construction AT"
+    },
+    {
+      "page": 13,
+      "textItems": 392,
+      "titleBlockItems": 143,
+      "sheetCandidates": [
+        "BED1",
+        "BM102",
+        "HTR150",
+        "A1",
+        "LB30",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.05"
+      ],
+      "selectedSheet": "A02.05",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE unit layout 1 95309/SD/A02.05 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "clearance legend 1000mm 3,185 102 3,000 77 600 102",
+      "titleBlockSample": "1,220 800 kitchen OHC ldry LM WM+ 102 102 102 BM bed 1"
+    },
+    {
+      "page": 14,
+      "textItems": 545,
+      "titleBlockItems": 196,
+      "sheetCandidates": [
+        "TDR1",
+        "PB1",
+        "C1",
+        "BC66.04",
+        "M2",
+        "OHC89",
+        "GR3",
+        "PB2",
+        "GR2",
+        "A1",
+        "LB30",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A02.06"
+      ],
+      "selectedSheet": "A02.06",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE unit layout 2 95309/SD/A02.06 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "clearance legend 1000mm 1,250 90 4,998 3,957 1,800 102",
+      "titleBlockSample": "NBN + NBN + 90 90 90 DSB DSB 2700 FFL dining dining entry"
+    },
+    {
+      "page": 15,
+      "textItems": 714,
+      "titleBlockItems": 234,
+      "sheetCandidates": [
+        "I3",
+        "E5",
+        "I2",
+        "E8",
+        "E2",
+        "I4",
+        "I-4",
+        "A1",
+        "I5",
+        "I-6",
+        "LB30",
+        "AU4",
+        "IS35",
+        "SD3",
+        "SD2",
+        "SD1",
+        "B27",
+        "A02.07"
+      ],
+      "selectedSheet": "A02.07",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-B 27/02/26 issue for SD1 submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE partition & finishes plan 95309/SD/A02.07 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "insulation Notes: surface finishes legend Refer to preliminary NatHERS and deep planting TOW 10.000 WOH Assessment TOW 9.400 TOW 9.800",
+      "titleBlockSample": "vinyl E5 I5: E5- 310 920 + FG SKT1 I4: blockwork + 76mm steel stud + 13mm plasterboard FFL E5"
+    },
+    {
+      "page": 16,
+      "textItems": 246,
+      "titleBlockItems": 109,
+      "sheetCandidates": [
+        "PB1",
+        "C1",
+        "LB30",
+        "A1",
+        "AU4",
+        "IS35",
+        "SD3",
+        "SD2",
+        "A02.08"
+      ],
+      "selectedSheet": "A02.08",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD2 20/03/26 issue for SD2 submission G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE reflected ceiling plans 95309/SD/A02.08 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "DP racking FC - 500 COL1 COL1 COL1",
+      "titleBlockSample": "2400 2700 2700 PB1 C1 PB1 C1 PB1 C1 2700 2700 PB1 C1 PB1 C1 2700 PB1 C1"
+    },
+    {
+      "page": 17,
+      "textItems": 660,
+      "titleBlockItems": 228,
+      "sheetCandidates": [
+        "PC1",
+        "PC3",
+        "EP3",
+        "COL1",
+        "EP1",
+        "TOW50",
+        "TOW10.000",
+        "IN4",
+        "IS7",
+        "A1",
+        "LB30",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A04.01"
+      ],
+      "selectedSheet": "A04.01",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE elevations 1 95309/SD/A04.01 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "legend 1 2 3 4 BAL1 Metal balustrade type 1 3,010",
+      "titleBlockSample": "2,450 EP2 RN EP3 RN EP3 1,700 SCRN1 RN RJ RN EP1"
+    },
+    {
+      "page": 18,
+      "textItems": 642,
+      "titleBlockItems": 217,
+      "sheetCandidates": [
+        "BAL2",
+        "COL1",
+        "TOW10.000",
+        "A1",
+        "LB30",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A04.02"
+      ],
+      "selectedSheet": "A04.02",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE elevations 2 95309/SD/A04.02 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "legend 4 3 2 1 3,012 5,670 4,055",
+      "titleBlockSample": "RN EP1 RN EP3 RJ WH MV MV MV MV WH CL"
+    },
+    {
+      "page": 19,
+      "textItems": 468,
+      "titleBlockItems": 173,
+      "sheetCandidates": [
+        "EP3",
+        "EP1",
+        "COL1",
+        "IN4",
+        "TO3",
+        "A1",
+        "PC3",
+        "LB30",
+        "AU4",
+        "SD3",
+        "SD2",
+        "WAS35",
+        "SD1",
+        "B27",
+        "A06",
+        "A05.01"
+      ],
+      "selectedSheet": "A05.01",
+      "candidateLines": [
+        {
+          "text": "MASTER PLAN SD1-A 06/02/26 issue for SD1 draft submission LB G. MCGRATH AUTHORISED FOR ISSUE 30/03/2026 DATE sections 95309/SD/A05.01 SD3",
+          "xRatio": 0.033,
+          "yRatio": 0.974
+        }
+      ],
+      "sample": "legend 1 2 3 4 4,370 4,055 5,670",
+      "titleBlockSample": "fall fall +23.200 FW 4 fourth floor CL unit 17 unit 18 unit 19 DP DP unit 20"
+    }
+  ]
+}

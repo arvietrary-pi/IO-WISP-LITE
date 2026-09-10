@@ -1,0 +1,30 @@
+const fs=require('node:fs');
+const vm=require('node:vm');
+const assert=require('node:assert/strict');
+const html=fs.readFileSync('releases/v0.0.5/IO_Wisp_Lite_V0.0.5.html','utf8');
+const source=html.slice(html.indexOf('      function setViewerStatus('),html.indexOf('      function viewerApplicationTarget('));
+const elements={};
+const $=id=>elements[id]??= {classList:{add(){},remove(){}},style:{},getContext(){return {};},clientWidth:838};
+const pages=[];
+const context={ $,state:{project:{sourceFile:'Sample.pdf',sheets:[{page:1,sheet:'A99',title:'Synthetic'}]}},viewerState:{page:1,scale:1,renderToken:0},window:{devicePixelRatio:1},escapeHtml:s=>s,switchTab(){},Uint8Array};
+vm.createContext(context);vm.runInContext(source,context);
+const pdf={numPages:19,async getPage(n){pages.push(n);return {getViewport:({scale})=>({width:1000*scale,height:500*scale}),render:()=>({promise:Promise.resolve(),cancel(){}})};}};
+(async()=>{
+  context.setViewerPdf(pdf,'Sample.pdf');await context.renderViewerPage(1);
+  assert.equal(context.viewerState.page,1);assert.equal($('viewerPageCount').textContent,19);
+  assert.equal($('viewerPrevBtn').disabled,true);assert.equal($('viewerNextBtn').disabled,false);
+  assert.equal(context.viewerDrawingForPage(1).sheet,'A99');
+  await context.goToViewerPage(2);assert.equal(context.viewerState.page,2);
+  await context.goToViewerPage(99);assert.equal(context.viewerState.page,19);assert.equal($('viewerNextBtn').disabled,true);
+  await context.goToViewerPage(0);assert.equal(context.viewerState.page,1);
+  context.viewerState.scale=1.15;await context.renderViewerPage();assert.equal($('viewerZoomText').textContent,'115%');
+  assert.match(html,/viewerState.scale\s*=\s*Math.min\(3,viewerState.scale\s*\+\s*\.15\)/);
+  assert.match(html,/viewerState.scale\s*=\s*Math.max\(\.2,viewerState.scale\s*-\s*\.15\)/);
+  await context.fitViewerWidth();assert.equal(context.viewerState.scale,.8);
+  assert.match($('viewerStatus').textContent,/Sample.pdf.*physical PDF page 1/);
+  context.setViewerPdf({...pdf,numPages:1},'one.pdf');await context.renderViewerPage(1);
+  assert.equal($('viewerPrevBtn').disabled,true);assert.equal($('viewerNextBtn').disabled,true);
+  context.viewerState.pdf=null;await context.renderViewerPage(1);assert.match($('viewerStatus').textContent,/Load the original source PDF/);
+  console.log(JSON.stringify({passed:true,physicalPages:19,oneBased:true,sourceContext:true,drawingNumber:'A99',drawingPhysicalPage:1,renderRequests:pages,
+    differences:['Flutter rejects malformed/fractional page input; legacy coerces Number.','Flutter visibly warns on integer clamping.','Flutter recomputes fit on viewport and geometry changes.','Flutter clears old raster before each request and requires managed identity; legacy can retain stale canvas and reopens by filename.','Flutter has no drawing metadata or embedded-text inspection.'],zoom:'20–300%, 15-point steps; initial 100%'},null,2));
+})().catch(e=>{console.error(e);process.exitCode=1;});

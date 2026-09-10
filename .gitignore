@@ -1,0 +1,65 @@
+# ==========================================
+# IO WISP LITE - Repository exclusions
+# ==========================================
+
+# Local Flutter SDK/runtime/cache
+.flutter-runtime/
+.pub-cache/
+
+# User/project data
+Files/
+# Phase 3 Dart source/test directories (Windows matching is case-insensitive).
+# Keep user Files data excluded; expose only these implementation Dart files.
+!io_wisp_app/lib/features/files/
+!io_wisp_app/lib/features/files/*.dart
+!io_wisp_app/test/files/
+!io_wisp_app/test/files/*.dart
+
+# Verification output / generated evidence
+outputs/
+
+# Flutter / Dart generated files
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+
+# IDE
+**/.idea/
+**/*.iml
+.vscode/
+
+# Android local machine configuration
+**/android/local.properties
+
+# Windows / Flutter generated files
+**/windows/flutter/ephemeral/
+
+# Environment variables / credentials
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.keystore
+*.jks
+
+# Databases created while running the application
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Operating system junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.log

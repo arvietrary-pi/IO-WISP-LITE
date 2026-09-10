@@ -1,0 +1,336 @@
+[
+  {
+    "name": "reference variant 1",
+    "raw": "Exclude Prelims and Testing. Include all others.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 2",
+    "raw": "EXCLUDE PRELIMS AND TESTING. INCLUDE ALL OTHERS.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 3",
+    "raw": "exclude prelims and testing; include all others",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 4",
+    "raw": "Exclude Prelims and Testing / Include All others",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 5",
+    "raw": "Exclude Prelims and Testing\nInclude all others",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 6",
+    "raw": "  Exclude  Prelims  and Testing.   Include all   others.  ",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 7",
+    "raw": "Include all others. Exclude Prelims and Testing.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 8",
+    "raw": "Include all except Prelims and Testing",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 9",
+    "raw": "Include everything but not Prelims and Testing",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 10",
+    "raw": "Include all excluding Prelims and Testing",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 11",
+    "raw": "Do not include Prelims and Testing. Include all others.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 12",
+    "raw": "Not included: Prelims and Testing. Include all others.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference variant 13",
+    "raw": "Out of scope: Prelims and Testing. In scope: all others.",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "reference non-strict",
+    "raw": "Exclude Prelims and Testing. Include all others.",
+    "strict": false,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "explicit only strict",
+    "raw": "Include concrete",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "concrete": "included"
+    }
+  },
+  {
+    "name": "explicit only non-strict",
+    "raw": "Include concrete",
+    "strict": false,
+    "default": "review",
+    "decisions": {
+      "concrete": "included"
+    }
+  },
+  {
+    "name": "all",
+    "raw": "Include all",
+    "strict": true,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "all scope",
+    "raw": "Include all scope",
+    "strict": true,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "all other packages",
+    "raw": "Include all other packages",
+    "strict": true,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "all non-strict",
+    "raw": "Include all",
+    "strict": false,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "exclusion wins",
+    "raw": "Exclude concrete. Include concrete",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "concrete": "rejected"
+    }
+  },
+  {
+    "name": "opposite order exclusion wins",
+    "raw": "Include concrete. Exclude concrete",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "concrete": "rejected"
+    }
+  },
+  {
+    "name": "heading lists",
+    "raw": "Inclusions:\nconcrete\nplumbing\nExclusions:\ntesting\nClarifications:\nelectrical",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "concrete": "included",
+      "plumbing": "included",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "plain text defaults to included",
+    "raw": "Concrete and plumbing",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "concrete": "included",
+      "plumbing": "included"
+    }
+  },
+  {
+    "name": "clarifications not inclusions",
+    "raw": "Clarifications: electrical and testing",
+    "strict": true,
+    "default": "held",
+    "decisions": {}
+  },
+  {
+    "name": "substring protection",
+    "raw": "Include empowerment, beamish, doorbell, windowpane, profile, rooftop, retesting, mechanicality, tilefish, rebarrier, concreteish, preplumbing",
+    "strict": true,
+    "default": "held",
+    "decisions": {}
+  },
+  {
+    "name": "regular plurals",
+    "raw": "Include doors, windows, foundations, slabs, beams, columns, trusses, partitions, finishes, tiles",
+    "strict": true,
+    "default": "held",
+    "decisions": {
+      "openings": "included",
+      "concrete": "included",
+      "structural": "included",
+      "masonry": "included",
+      "finishes": "included"
+    }
+  },
+  {
+    "name": "empty strict",
+    "raw": "",
+    "strict": true,
+    "default": "held",
+    "decisions": {}
+  },
+  {
+    "name": "empty non-strict",
+    "raw": "",
+    "strict": false,
+    "default": "review",
+    "decisions": {}
+  },
+  {
+    "name": "whitespace strict",
+    "raw": "  \n\t ",
+    "strict": true,
+    "default": "held",
+    "decisions": {}
+  },
+  {
+    "name": "unknown text",
+    "raw": "Unspecified owner requirements",
+    "strict": true,
+    "default": "held",
+    "decisions": {}
+  },
+  {
+    "name": "comma directive",
+    "raw": "Exclude prelims and testing, include all others",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "comma exception",
+    "raw": "Include all, except prelims and testing",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "remaining scope",
+    "raw": "Include remaining scope",
+    "strict": true,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "all variants",
+    "raw": "Include the rest",
+    "strict": true,
+    "default": "included",
+    "decisions": {}
+  },
+  {
+    "name": "windows newlines",
+    "raw": "Exclude Prelims and Testing\r\nInclude all others",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  },
+  {
+    "name": "question punctuation",
+    "raw": "Exclude Prelims and Testing!Include all others?",
+    "strict": true,
+    "default": "included",
+    "decisions": {
+      "preliminaries": "rejected",
+      "testing": "rejected"
+    }
+  }
+]

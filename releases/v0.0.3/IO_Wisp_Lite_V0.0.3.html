@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IO Wisp Lite V0.0.3 — Plan Indexer & Estimator's Fieldbook</title>
+  <style>
+    :root {
+      --ink: #162238;
+      --muted: #66738a;
+      --line: #dbe3ef;
+      --panel: #ffffff;
+      --canvas: #f4f7fb;
+      --navy: #10243f;
+      --blue: #1769aa;
+      --cyan: #2e9cca;
+      --gold: #f2b84b;
+      --green: #1c8b68;
+      --red: #c44c4c;
+      --shadow: 0 10px 26px rgba(16, 36, 63, .08);
+      --radius: 15px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); line-height: 1.45; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { min-height: 100vh; }
+    .topbar { background: linear-gradient(115deg, rgba(13,32,56,.97), rgba(23,59,99,.86) 70%, rgba(31,101,135,.76)), url('io-wisp-blueprint-header.png') center / cover; color: white; padding: 22px clamp(18px, 4vw, 56px) 20px; }
+    .topbar-inner { max-width: 1440px; margin: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .brand-kicker { margin: 0 0 4px; color: #8ed6ed; font-size: .76rem; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.2rem); letter-spacing: -.03em; }
+    .subtitle { margin: 5px 0 0; color: #c7d8ea; max-width: 710px; }
+    .version-badge { align-self: flex-start; border: 1px solid rgba(142,214,237,.5); border-radius: 999px; padding: 6px 10px; background: rgba(10,28,50,.42); color: #d9f4fc; font-size: .76rem; font-weight: 850; letter-spacing: .08em; white-space: nowrap; }
+    .workspace { max-width: 1440px; margin: 0 auto; padding: 22px clamp(16px, 3vw, 44px) 54px; }
+    .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--line); margin-bottom: 18px; overflow-x: auto; }
+    .tab { appearance: none; background: transparent; border: 0; color: var(--muted); padding: 11px 14px; border-bottom: 3px solid transparent; font-weight: 750; white-space: nowrap; }
+    .tab.active { color: var(--blue); border-color: var(--cyan); }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(16px, 2vw, 25px); margin-bottom: 18px; }
+    .panel h2, .panel h3 { margin: 0; letter-spacing: -.015em; }
+    .panel h2 { font-size: 1.25rem; }
+    .panel h3 { font-size: 1rem; }
+    .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 16px; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+    .grid { display: grid; gap: 14px; }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    label.field { display: block; color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    label.field input, label.field select, label.field textarea { display: block; width: 100%; margin-top: 6px; color: var(--ink); background: #fbfdff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; outline: none; }
+    label.field input:focus, label.field select:focus, label.field textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(46,156,202,.13); }
+    textarea { min-height: 110px; resize: vertical; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+    .btn { border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; background: #fff; color: var(--ink); font-weight: 750; transition: .15s ease; }
+    .btn:hover { transform: translateY(-1px); border-color: #a8bfd8; box-shadow: 0 4px 10px rgba(16,36,63,.08); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .btn.primary { background: var(--blue); border-color: var(--blue); color: white; }
+    .btn.dark { background: var(--navy); border-color: var(--navy); color: white; }
+    .btn.soft { background: #eef7fb; border-color: #c8e8f2; color: #135777; }
+    .btn.danger { color: var(--red); }
+    .btn.small { padding: 6px 9px; font-size: .8rem; }
+    .hidden { display: none !important; }
+    .status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: .86rem; min-height: 22px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--green); }
+    .dot.warn { background: var(--gold); }
+    .dot.bad { background: var(--red); }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 18px; }
+    .stat { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: linear-gradient(145deg, #fff, #f8fbfe); }
+    .stat .value { display: block; font-size: 1.55rem; font-weight: 850; color: var(--navy); }
+    .stat .label { color: var(--muted); font-size: .78rem; font-weight: 750; }
+    .toolbar { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .toolbar-left, .toolbar-right { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+    .search { min-width: min(330px, 70vw); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 970px; }
+    th { background: #f1f6fb; color: #52647b; text-transform: uppercase; letter-spacing: .05em; font-size: .72rem; text-align: left; white-space: nowrap; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid #e7edf4; vertical-align: top; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #fbfdff; }
+    .sheet-id { font-weight: 850; color: var(--navy); white-space: nowrap; }
+    .page-no { color: var(--muted); font-size: .82rem; }
+    .label-main { font-weight: 750; }
+    .evidence { max-width: 300px; color: var(--muted); font-size: .8rem; }
+    .confidence, .badge { display: inline-flex; border-radius: 999px; padding: 4px 8px; font-size: .72rem; font-weight: 800; white-space: nowrap; }
+    .confidence.high, .badge.ready { background: #e1f5ed; color: #146c50; }
+    .confidence.medium, .badge.review { background: #fff3d5; color: #8d6412; }
+    .confidence.low, .badge.exclude { background: #fbe8e7; color: #99433e; }
+    .row-input { width: 100%; min-width: 125px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; }
+    .row-input.label-input { min-width: 235px; }
+    .row-input.notes-input { min-width: 180px; min-height: 45px; resize: vertical; }
+    .empty { text-align: center; padding: 36px 18px; color: var(--muted); }
+    .callout { border-left: 4px solid var(--cyan); border-radius: 8px; background: #eef8fb; color: #27566c; padding: 11px 13px; font-size: .88rem; }
+    .callout.warn { border-color: var(--gold); background: #fff8e9; color: #6f531c; }
+    .folder-card { margin-top: 14px; padding: 13px 14px; border: 1px solid #cfe3ee; border-radius: 11px; background: linear-gradient(145deg, #f7fcfe, #eef8fb); }
+    .folder-card h3 { color: var(--navy); margin: 0 0 3px; }
+    .folder-card p { color: var(--muted); margin: 0 0 10px; font-size: .84rem; }
+    .folder-name { margin-top: 9px; color: #27566c; font-size: .82rem; word-break: break-word; }
+    .checklist-summary { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: .9rem; }
+    .progress { width: min(340px, 100%); height: 9px; background: #e8eef4; border-radius: 99px; overflow: hidden; }
+    .progress > span { display: block; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--green)); border-radius: inherit; transition: width .2s ease; }
+    .check-section { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+    .check-section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #f5f8fb; padding: 12px 14px; }
+    .check-section-head h3 { margin: 0; }
+    .check-count { color: var(--muted); font-size: .8rem; }
+    .check-items { padding: 6px 14px 9px; }
+    .check-item { display: grid; grid-template-columns: auto minmax(0,1fr) minmax(190px, .7fr) minmax(145px, .5fr); gap: 11px; align-items: start; padding: 10px 0; border-bottom: 1px dashed #e2e9f1; }
+    .check-item:last-child { border-bottom: 0; }
+    .check-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--green); margin-top: 2px; }
+    .check-title { font-weight: 700; }
+    .check-prompt { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+    .check-note { width: 100%; min-height: 38px; border: 1px solid var(--line); border-radius: 8px; padding: 7px 8px; color: var(--ink); }
+    .check-time { display: grid; gap: 5px; align-content: start; }
+    .check-time .button-row { gap: 5px; }
+    .check-time .btn { padding: 5px 7px; font-size: .72rem; }
+    .time-stat { min-height: 86px; }
+    .time-log-table { min-width: 820px; }
+    .pricing-table { min-width: 1540px; }
+    .pricing-status { min-height: 28px; }
+    .report-note { color: var(--muted); font-size: .84rem; margin-top: 8px; }
+    .viewer-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .viewer-page-input { width: 76px; border: 1px solid var(--line); border-radius: 9px; padding: 8px 9px; text-align: center; }
+    .viewer-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 16px; align-items: start; }
+    .viewer-canvas-wrap { min-height: 520px; overflow: auto; display: grid; place-items: start center; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #dfe6ee; }
+    #pdfViewerCanvas { display: block; max-width: none; background: white; box-shadow: 0 8px 24px rgba(16,36,63,.2); }
+    .viewer-empty { width: 100%; min-height: 480px; display: grid; place-items: center; color: var(--muted); text-align: center; padding: 28px; }
+    .viewer-sidebar { display: grid; gap: 12px; }
+    .viewer-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #fff; }
+    .viewer-card h3 { margin: 0 0 5px; color: var(--navy); }
+    .viewer-card p { margin: 0; color: var(--muted); font-size: .86rem; }
+    .content-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #fff; }
+    .content-card h3 { color: var(--navy); margin-bottom: 4px; }
+    .content-card p { color: var(--muted); font-size: .82rem; margin: 0 0 9px; }
+    .content-card textarea { min-height: 120px; }
+    .roadmap-list { display: grid; gap: 12px; }
+    .roadmap-item { display: grid; grid-template-columns: 46px minmax(0,1fr); gap: 14px; border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: linear-gradient(145deg, #fff, #fbfdff); }
+    .roadmap-number { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--navy); font-weight: 850; }
+    .roadmap-item h3 { color: var(--navy); margin: 0; }
+    .roadmap-item p { margin: 3px 0 0; color: var(--muted); font-size: .83rem; }
+    .roadmap-output { margin: 10px 0 12px; padding: 9px 11px; border-left: 3px solid var(--cyan); background: #eef8fb; color: #27566c; border-radius: 7px; font-size: .83rem; }
+    .roadmap-fields { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 10px; }
+    .mini-list { margin: 0; padding-left: 19px; color: var(--muted); font-size: .88rem; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--navy); color: white; padding: 10px 14px; border-radius: 9px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 10; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .footer-note { color: var(--muted); text-align: center; font-size: .78rem; margin-top: 16px; }
+    @media (max-width: 900px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; }
+      .grid-4, .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .check-item { grid-template-columns: auto minmax(0,1fr); }
+      .check-note { grid-column: 2; }
+      .check-time { grid-column: 2; }
+      .roadmap-fields { grid-template-columns: 1fr; }
+      .viewer-layout { grid-template-columns: 1fr; }
+      .viewer-sidebar { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 600px) {
+      .workspace { padding-top: 12px; }
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .stats { gap: 8px; }
+      .stat { padding: 11px; }
+      .stat .value { font-size: 1.3rem; }
+      .panel { padding: 14px; }
+      .viewer-sidebar { grid-template-columns: 1fr; }
+      .viewer-canvas-wrap { min-height: 380px; padding: 8px; }
+    }
+    @media print {
+      .topbar { background: white; color: black; padding: 0 0 10px; }
+      .brand-kicker, .subtitle, .tabs, .toolbar, .panel:not(#tocPanel), .button-row, .footer-note { display: none !important; }
+      .workspace { padding: 0; }
+      .panel { box-shadow: none; border: 0; padding: 0; }
+      table { min-width: 0; font-size: 9px; }
+      th, td { padding: 5px; }
+      .row-input { border: 0; padding: 0; }
+      .evidence { max-width: none; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div>
+          <p class="brand-kicker">IO Wisp · Input & Output</p>
+          <h1>Plan Indexer & Estimator's Fieldbook</h1>
+          <p class="subtitle">A transparent, local-first foundation for organizing plan sets and preparing an estimate.</p>
+        </div>
+        <div class="version-badge" aria-label="Application version">V0.0.3</div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <nav class="tabs" aria-label="Main sections">
+        <button class="tab active" data-tab="index">Plan Index</button>
+        <button class="tab" data-tab="viewer">Plan Viewer</button>
+        <button class="tab" data-tab="scope">Scope Brief</button>
+        <button class="tab" data-tab="checklist">Estimator Checklist</button>
+        <button class="tab" data-tab="content">Estimate Content</button>
+        <button class="tab" data-tab="roadmap">Estimating Roadmap</button>
+        <button class="tab" data-tab="time">Time & Report</button>
+        <button class="tab" data-tab="pricing">Pricing Library</button>
+      </nav>
+
+      <section id="indexTab" class="tab-panel">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Project control</h2>
+              <p>These details travel with the sheet index and estimate notes.</p>
+            </div>
+            <div class="button-row">
+              <button class="btn soft" id="loadDemoBtn">Load demo set</button>
+              <button class="btn" id="clearBtn">Clear project</button>
+            </div>
+          </div>
+          <div class="grid grid-4">
+            <label class="field">Project name<input id="projectName" placeholder="e.g., 4 Baynes Street" /></label>
+            <label class="field">Location / client<input id="projectLocation" placeholder="Location or client" /></label>
+            <label class="field">Set / revision<input id="projectRevision" placeholder="e.g., SD Rev 03 · 30/03/2026" /></label>
+            <label class="field">Estimator<input id="estimator" placeholder="Name" /></label>
+          </div>
+          <div class="status-line" style="margin-top:14px"><span class="dot"></span><span id="saveStatus">Ready. Changes save in this browser.</span></div>
+          <div class="folder-card">
+            <h3>Project folder</h3>
+            <p>Choose a parent folder once. IO Wisp will create a dated folder inside it and place source files and generated outputs there.</p>
+            <div class="button-row"><button class="btn soft" id="chooseParentFolderBtn">Choose parent folder</button><button class="btn" id="createProjectFolderBtn">Create project folder</button></div>
+            <div class="status-line" style="margin-top:10px"><span class="dot warn"></span><span id="folderStatus">No project folder selected yet.</span></div>
+            <div class="folder-name">Folder name: <strong id="projectFolderName">Untitled Project_Client - today</strong></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Import a plan set</h2>
+              <p>PDF extraction reads embedded CAD text, preserves page position, and creates a concise page summary. You can also import a `.txt` extraction or a previous IO Wisp `.json` file.</p>
+            </div>
+          </div>
+          <div class="button-row">
+            <input id="fileInput" type="file" accept=".pdf,.txt,.json,application/pdf,application/json,text/plain" />
+            <button class="btn primary" id="analyzeBtn">Analyze selected file</button>
+            <button class="btn" id="addSheetBtn">Add blank sheet</button>
+            <button class="btn dark" id="exportJsonBtn">Save project file</button>
+            <input id="projectFileInput" type="file" accept=".json,application/json" />
+            <button class="btn" id="openProjectBtn">Open saved project</button>
+            <button class="btn" id="exportCsvBtn">Export TOC CSV</button>
+            <button class="btn primary" id="exportXlsxBtn">Export Excel workbook</button>
+            <button class="btn" id="printBtn">Print TOC</button>
+          </div>
+          <div class="button-row" style="margin-top:12px">
+            <input id="editedPdfInput" type="file" accept=".pdf,application/pdf" />
+            <button class="btn soft" id="saveLabeledPdfBtn">Save edited PDF as “Labeled, annotated.pdf”</button>
+          </div>
+          <div class="page-no" style="margin-top:7px">Choose a PDF you annotated externally and IO Wisp will copy it into the project folder with the standard name above.</div>
+          <div class="callout" style="margin-top:13px">Your work saves automatically in this browser. Use <strong>Save project file</strong> to download a portable JSON backup, then use <strong>Open saved project</strong> to continue on this or another computer. The saved project includes the index, checklist, roadmap, estimate notes, and time log; keep the original PDF beside it because the PDF itself is not embedded.</div>
+          <div class="status-line" style="margin-top:12px"><span class="dot warn"></span><span id="importStatus">No plan set loaded yet.</span></div>
+          <div class="callout" style="margin-top:13px"><strong>PDF links:</strong> Keep the exported Excel workbook beside the source PDF. The workbook uses the physical PDF page number—not the drawing sheet number—to open the source page.</div>
+          <div class="callout warn" style="margin-top:13px">Pages without readable embedded text are flagged for manual entry. Exact scaled takeoffs still require visual/CAD review; this tool organizes evidence and prompts.</div>
+        </section>
+
+        <section class="panel" id="tocPanel">
+          <div class="panel-head">
+            <div>
+              <h2>Table of contents</h2>
+              <p>Review the detected title block, page summary, and physical-page link before using this as the estimate's document register.</p>
+            </div>
+            <button class="btn soft" id="copyTocBtn">Copy TOC</button>
+          </div>
+          <div class="stats">
+            <div class="stat"><span class="value" id="pageStat">0</span><span class="label">Physical pages</span></div>
+            <div class="stat"><span class="value" id="sheetStat">0</span><span class="label">Sheet entries</span></div>
+            <div class="stat"><span class="value" id="reviewStat">0</span><span class="label">Needs review</span></div>
+            <div class="stat"><span class="value" id="doneStat">0%</span><span class="label">Checklist complete</span></div>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <input class="search" id="tocSearch" placeholder="Search sheet, label, evidence…" />
+              <select id="disciplineFilter" class="row-input"><option value="">All disciplines</option></select>
+              <select id="statusFilter" class="row-input"><option value="">All statuses</option><option value="ready">Ready</option><option value="review">Review</option><option value="exclude">Exclude</option></select>
+            </div>
+            <div class="toolbar-right"><span class="page-no" id="visibleCount">0 visible</span></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>PDF page</th><th>Sheet</th><th>Clean label</th><th>Discipline</th><th>Page summary</th><th>Revision / scale</th><th>Confidence</th><th>Evidence</th><th>Status</th><th>Notes</th><th>Open</th><th></th></tr></thead>
+              <tbody id="tocBody"><tr><td colspan="12" class="empty">Import a plan set or load the demo set to create the table of contents.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="viewerTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Plan viewer</h2><p>Open the source PDF inside IO Wisp and move directly between physical PDF pages.</p></div>
+            <div class="button-row"><input id="viewerFileInput" type="file" accept=".pdf,application/pdf" /><button class="btn primary" id="loadViewerPdfBtn">Load source PDF</button></div>
+          </div>
+          <div class="toolbar">
+            <div class="viewer-controls">
+              <button class="btn" id="viewerPrevBtn">Previous</button>
+              <label class="page-no" for="viewerPageInput">PDF page</label>
+              <input id="viewerPageInput" class="viewer-page-input" type="number" min="1" value="1" />
+              <span class="page-no">of <strong id="viewerPageCount">0</strong></span>
+              <button class="btn" id="viewerNextBtn">Next</button>
+            </div>
+            <div class="viewer-controls">
+              <button class="btn" id="viewerZoomOutBtn">−</button>
+              <span class="page-no" id="viewerZoomText">100%</span>
+              <button class="btn" id="viewerZoomInBtn">+</button>
+              <button class="btn soft" id="viewerFitBtn">Fit width</button>
+            </div>
+          </div>
+          <div class="status-line"><span class="dot warn"></span><span id="viewerStatus">Load a source PDF or analyze one on the Plan Index tab.</span></div>
+        </section>
+        <section class="panel">
+          <div class="viewer-layout">
+            <div class="viewer-canvas-wrap" id="viewerCanvasWrap">
+              <div class="viewer-empty" id="viewerEmpty">No PDF is loaded.<br />Select the original plan PDF to begin.</div>
+              <canvas id="pdfViewerCanvas" class="hidden" aria-label="Rendered construction plan PDF page"></canvas>
+            </div>
+            <aside class="viewer-sidebar">
+              <div class="viewer-card"><h3 id="viewerDrawingTitle">No drawing selected</h3><p id="viewerSheetMeta">Sheet — · PDF page —</p></div>
+              <div class="viewer-card"><h3>Page summary</h3><p id="viewerPageSummary">The detected page summary will appear here.</p></div>
+              <div class="viewer-card"><h3>Drawing metadata</h3><p id="viewerDrawingMeta">Discipline —<br />Revision —<br />Scale —</p></div>
+              <div class="viewer-card"><h3>Extraction evidence</h3><p id="viewerEvidence">No embedded-text evidence is available.</p></div>
+            </aside>
+          </div>
+        </section>
+      </section>
+
+      <section id="scopeTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Scope brief input</h2><p>Paste the client request like a chat message, or upload a TXT/MD/JSON brief. IO Wisp keeps the original wording and creates a strict scope gate.</p></div>
+            <div class="button-row"><button class="btn soft" id="copyScopeBtn">Copy scope gate</button><button class="btn primary" id="applyScopeBtn">Apply scope brief</button></div>
+          </div>
+          <label class="field">What do you want estimated?<textarea id="scopeBriefInput" class="row-input" style="min-height:150px" placeholder="Example: Estimate roof replacement and gutters only. Include removal, disposal, new long-span roofing, flashings and gutters. Exclude structural framing, electrical, painting and permits."></textarea></label>
+          <div class="button-row" style="margin-top:12px"><input id="scopeBriefFileInput" type="file" accept=".txt,.md,.json,text/plain,text/markdown,application/json" /><button class="btn" id="loadScopeFileBtn">Load brief file</button><label class="field" style="display:flex;flex-direction:row;align-items:center;gap:8px"><input id="strictScopeMode" type="checkbox" checked /> Reject work not explicitly included</label></div>
+          <div class="status-line" style="margin-top:12px"><span class="dot warn"></span><span id="scopeStatus">No scope brief applied yet.</span></div>
+          <div class="callout warn" style="margin-top:13px"><strong>Strict scope rule:</strong> explicit exclusions are rejected; items explicitly included are accepted; everything else is placed on hold for clarification. IO Wisp will not silently add work just because it appears on a drawing.</div>
+        </section>
+        <section class="panel">
+          <div class="grid grid-2"><label class="field">Included scope<textarea id="scopeIncluded" class="row-input" style="min-height:150px" placeholder="One item per line…"></textarea></label><label class="field">Excluded / rejected scope<textarea id="scopeExcluded" class="row-input" style="min-height:150px" placeholder="One item per line…"></textarea></label></div>
+          <label class="field" style="margin-top:12px">Clarifications / undecided items<textarea id="scopeClarifications" class="row-input" style="min-height:100px" placeholder="Items that require confirmation before estimating…"></textarea></label>
+        </section>
+        <section class="panel"><div class="panel-head"><div><h2>Scope gate</h2><p>Standard estimating work packages checked against the brief. You can override any decision.</p></div></div><div id="scopeGateRoot" class="table-wrap"></div></section>
+      </section>
+
+      <section id="checklistTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Estimator checklist</h2><p>Use this before, during, and immediately before issuing an estimate.</p></div>
+            <div class="button-row"><button class="btn" id="resetChecklistBtn">Reset checklist</button><button class="btn soft" id="copyChecklistBtn">Copy checklist</button></div>
+          </div>
+          <div class="checklist-summary"><strong id="checklistText">0 of 0 complete</strong><div class="progress"><span id="checkProgress" style="width:0%"></span></div><span id="checkPercent">0%</span></div>
+        </section>
+        <div id="checklistRoot"></div>
+      </section>
+
+      <section id="contentTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head"><div><h2>Estimate content</h2><p>These prompts give your estimate package a consistent structure and an audit trail.</p></div><div class="button-row"><button class="btn soft" id="copyContentBtn">Copy estimate brief</button></div></div>
+          <div class="grid grid-2" id="contentRoot"></div>
+        </section>
+        <section class="panel">
+          <h2>Recommended final package</h2>
+          <p style="color:var(--muted);margin-top:5px">Keep these deliverables together with the estimate.</p>
+          <ol class="mini-list">
+            <li>Document register / table of contents</li>
+            <li>Scope summary and drawing/specification basis</li>
+            <li>Detailed quantity takeoff or BOQ with sheet references</li>
+            <li>Material, labor, equipment, and subcontractor pricing basis</li>
+            <li>Assumptions, allowances, exclusions, alternates, and provisional sums</li>
+            <li>Clarifications, RFIs, risks, constructability notes, and unresolved flags</li>
+            <li>Revision/change log and final review record</li>
+          </ol>
+        </section>
+      </section>
+
+      <section id="roadmapTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Estimating roadmap</h2><p>A preliminary sequence generated from the document set and standard estimating practice. Adjust it for the project before relying on it.</p></div>
+            <div class="button-row"><button class="btn soft" id="resetRoadmapBtn">Reset roadmap</button><button class="btn" id="copyRoadmapBtn">Copy roadmap</button></div>
+          </div>
+          <div class="callout warn">This is a planning aid, not an automatic construction schedule. The PDF can suggest drawing disciplines and review stages, but quantities, rates, duration, and final scope still require your judgment.</div>
+        </section>
+        <div id="roadmapRoot" class="roadmap-list"></div>
+      </section>
+
+      <section id="timeTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Time & report</h2><p>Track the time spent on the whole estimate or on individual checklist items.</p></div>
+            <div class="button-row"><button class="btn primary" id="startEstimateTimerBtn">Start estimate timer</button><button class="btn" id="stopEstimateTimerBtn">Stop estimate timer</button><button class="btn soft" id="downloadReportBtn">Generate report</button><button class="btn" id="printReportBtn">Print / Save PDF</button></div>
+          </div>
+          <div class="stats">
+            <div class="stat time-stat"><span class="value" id="estimateTimeStat">0m</span><span class="label">Whole estimate timer</span></div>
+            <div class="stat time-stat"><span class="value" id="checklistTimeStat">0m</span><span class="label">Checklist time</span></div>
+            <div class="stat time-stat"><span class="value" id="totalTimeStat">0m</span><span class="label">All recorded time</span></div>
+            <div class="stat time-stat"><span class="value" id="activeTimeStat">None</span><span class="label">Active task</span></div>
+          </div>
+          <div class="callout">Use Start and Stop on the whole estimate or beside a checklist item. IO Wisp allows one active timer at a time, records time in/time out, and keeps finished sessions in the project log.</div>
+          <div class="status-line" style="margin-top:12px"><span class="dot"></span><span id="timeStatus">No active timer.</span></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h2>Time log</h2><p>Every session is retained with its time in, time out, duration, and note.</p></div></div>
+          <div id="timeLogRoot" class="table-wrap"><table class="time-log-table"><tbody><tr><td class="empty">No time sessions recorded yet.</td></tr></tbody></table></div>
+        </section>
+      </section>
+
+      <section id="pricingTab" class="tab-panel hidden">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Pricing library</h2><p>Keep reusable material, labor, equipment, and subcontractor rates available across estimates.</p></div>
+            <div class="button-row"><button class="btn soft" id="exportPricingXlsxBtn">Export pricing Excel</button><button class="btn" id="exportPricingCsvBtn">Export pricing CSV</button></div>
+          </div>
+          <div class="callout">Import an Excel/CSV file for structured rates. TXT and PDF imports use transparent table-line heuristics and should always be checked against the original source, date, currency, and supplier.</div>
+          <div class="button-row" style="margin-top:13px">
+            <input id="pricingFileInput" type="file" accept=".xlsx,.xls,.csv,.json,.txt,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/json,text/plain,application/pdf" />
+            <button class="btn primary" id="importPricingBtn">Import pricing file</button>
+            <button class="btn" id="addPricingBtn">Add pricing row</button>
+            <button class="btn danger" id="clearPricingBtn">Clear pricing library</button>
+          </div>
+          <div class="status-line pricing-status" style="margin-top:12px"><span class="dot"></span><span id="pricingStatus">No pricing source loaded.</span></div>
+          <div class="stats" style="margin-top:14px">
+            <div class="stat time-stat"><span class="value" id="pricingCountStat">0</span><span class="label">Pricing records</span></div>
+            <div class="stat time-stat"><span class="value" id="pricingSourceStat">—</span><span class="label">Latest source</span></div>
+            <div class="stat time-stat"><span class="value" id="pricingCategoryStat">0</span><span class="label">Categories</span></div>
+            <div class="stat time-stat"><span class="value" id="pricingCurrencyStat">—</span><span class="label">Currencies</span></div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="toolbar">
+            <div class="toolbar-left"><input class="search" id="pricingSearch" placeholder="Search item, category, unit, source…" /><select id="pricingCategoryFilter" class="row-input"><option value="">All categories</option></select></div>
+            <div class="toolbar-right"><span class="page-no" id="pricingVisibleCount">0 visible</span></div>
+          </div>
+          <div class="table-wrap">
+            <table class="pricing-table">
+              <thead><tr><th>Category</th><th>Item / description</th><th>Unit</th><th>Material rate</th><th>Labor rate</th><th>Equipment rate</th><th>Total rate</th><th>Currency</th><th>Source</th><th>Date</th><th>Notes</th><th></th></tr></thead>
+              <tbody id="pricingBody"><tr><td colspan="12" class="empty">Import a pricing file or add a row to start the library.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <p class="footer-note">IO Wisp Lite is an organizing and review aid. Confirm drawings, specifications, quantities, rates, and engineering decisions before issuing a price.</p>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* IO Wisp Lite V0.0.3: V0.0.2 extraction and links plus an in-app PDF viewer. */
+    (() => {
+      'use strict';
+
+      const APP_VERSION = 'V0.0.3';
+      const STORAGE_KEY = 'io-wisp-lite-project-v1';
+      const $ = (id) => document.getElementById(id);
+      const state = {
+        project: {
+          name: '', location: '', revision: '', estimator: '',
+          pages: 0, sourceFile: '',
+          sheets: [], checklist: [], content: {}, roadmap: [], timeEntries: [], scopeBrief: {},
+          folderName: '', folderCreatedAt: '', files: []
+        }
+      };
+      const viewerQuery = new URLSearchParams(window.location.search);
+      const viewerState = {
+        pdf:null,
+        fileName:'',
+        page:Math.max(1, Number(viewerQuery.get('page')) || 1),
+        scale:1,
+        renderToken:0,
+        renderTask:null,
+        requested:Boolean(viewerQuery.get('viewer') === '1' || viewerQuery.get('page'))
+      };
+      const PRICING_STORAGE_KEY = 'io-wisp-pricing-library-v1';
+      const pricingState = {items:[], sourceFile:'', importedAt:''};
+      const HANDLE_DB_NAME = 'io-wisp-file-handles-v1';
+      const HANDLE_STORE_NAME = 'handles';
+      const fileSystemState = {parentHandle:null, projectHandle:null};
+
+      const TITLE_RULES = [
+        { title: 'Cover / Drawing Index', discipline: 'General', words: ['cover sheet', 'title sheet', 'drawing index', 'drawing schedule', 'sheet index', 'project information'] },
+        { title: 'General Notes & Legends', discipline: 'General', words: ['general notes', 'legend', 'legends', 'abbreviations', 'symbols'] },
+        { title: 'Yield / Information Data', discipline: 'Architectural', words: ['yield information', 'yield data', 'unit yield', 'yield information data'] },
+        { title: 'Private Open Spaces Diagram', discipline: 'Architectural', words: ['private open spaces', 'private open space'] },
+        { title: 'Survey / Existing Conditions Plan', discipline: 'Civil / Site', words: ['survey plan', 'site survey', 'existing conditions', 'contour plan', 'feature survey'] },
+        { title: 'Site Plan', discipline: 'Civil / Site', words: ['site plan', 'site layout', 'site analysis', 'site circulation'] },
+        { title: 'Demolition Plan', discipline: 'Architectural', words: ['demolition plan', 'demolition', 'remove existing'] },
+        { title: 'Fire Egress / Life Safety Plan', discipline: 'Fire / Life Safety', words: ['fire egress', 'life safety', 'fire exit', 'egress plan', 'fire protection'] },
+        { title: 'Grading / Earthworks Plan', discipline: 'Civil / Site', words: ['grading plan', 'earthworks', 'cut and fill', 'earthwork'] },
+        { title: 'Drainage / Stormwater Plan', discipline: 'Civil / Site', words: ['stormwater', 'storm water', 'drainage plan', 'surface water'] },
+        { title: 'Utilities Plan', discipline: 'Civil / Site', words: ['utilities plan', 'utility plan', 'sewer plan', 'water supply', 'underground services'] },
+        { title: 'Floor Plan', discipline: 'Architectural', words: ['floor plan', 'floor plans', 'unit plan', 'apartment plan', 'room layout'] },
+        { title: 'Roof Plan', discipline: 'Architectural', words: ['roof plan', 'roof layout', 'roof framing'] },
+        { title: 'Reflected Ceiling Plan', discipline: 'Architectural', words: ['reflected ceiling', 'ceiling plan', 'ceiling plans'] },
+        { title: 'Elevations', discipline: 'Architectural', words: ['elevations', 'elevation'] },
+        { title: 'Sections', discipline: 'Architectural', words: ['sections', 'section'] },
+        { title: 'Architectural Details', discipline: 'Architectural', words: ['construction details', 'architectural details', 'details'] },
+        { title: 'Doors / Windows / Hardware Schedules', discipline: 'Architectural', words: ['door schedule', 'window schedule', 'hardware schedule', 'doors and windows'] },
+        { title: 'Room Finishes / Fitout Plan', discipline: 'Architectural', words: ['room finishes', 'finishes plan', 'fitouts', 'fitout', 'finish schedule'] },
+        { title: 'Furniture & Equipment Plan', discipline: 'Architectural', words: ['furniture', 'equipment plan', 'furniture and equipment'] },
+        { title: 'Foundation / Footing Plan', discipline: 'Structural', words: ['foundation plan', 'footing plan', 'footings', 'foundation layout'] },
+        { title: 'Structural Framing Plan', discipline: 'Structural', words: ['framing plan', 'structural framing', 'floor framing', 'roof framing plan'] },
+        { title: 'Structural Slab / Reinforcement Plan', discipline: 'Structural', words: ['slab plan', 'reinforcement plan', 'reinforcement', 'rebar plan'] },
+        { title: 'Structural Details', discipline: 'Structural', words: ['structural details', 'beam details', 'column details', 'connection details'] },
+        { title: 'Mechanical / HVAC Plan', discipline: 'Mechanical', words: ['mechanical plan', 'hvac', 'air conditioning', 'ductwork'] },
+        { title: 'Electrical / Lighting Plan', discipline: 'Electrical', words: ['electrical plan', 'lighting plan', 'power plan', 'electrical layout'] },
+        { title: 'Plumbing / Hydraulic Plan', discipline: 'Plumbing / Hydraulic', words: ['plumbing plan', 'hydraulics', 'hydraulic plan', 'sanitary plan', 'water services'] },
+        { title: 'Communications / Security Plan', discipline: 'Electrical', words: ['communications', 'data plan', 'security plan', 'cctv', 'access control'] },
+        { title: 'Landscape / External Works Plan', discipline: 'Landscape / External', words: ['landscape plan', 'landscaping', 'external works', 'hardscape', 'planting plan'] },
+        { title: 'Specifications / Technical Notes', discipline: 'General', words: ['specification', 'technical notes', 'ncc report', 'standards'] }
+      ];
+      const PREFIX_DISCIPLINES = [
+        {prefix: /^FP|^FS|^F\b/, discipline: 'Fire / Life Safety'},
+        {prefix: /^PL|^P\b|^H\b/, discipline: 'Plumbing / Hydraulic'},
+        {prefix: /^ME|^M\b/, discipline: 'Mechanical'},
+        {prefix: /^EL|^E\b/, discipline: 'Electrical'},
+        {prefix: /^ST|^S\b/, discipline: 'Structural'},
+        {prefix: /^CV|^C\b/, discipline: 'Civil / Site'},
+        {prefix: /^L\b/, discipline: 'Landscape / External'},
+        {prefix: /^AR|^A\b|^G\b|^GN/, discipline: 'Architectural'}
+      ];
+      const PAGE_TOPICS = [
+        {label:'dimensions and setting out', words:['dimension','dimensions','setting out','setout','grid line','gridline']},
+        {label:'levels and elevations', words:['level','levels','elevation','elevations','datum','finished floor']},
+        {label:'materials and specifications', words:['material','materials','specification','specifications','finish','finishes']},
+        {label:'construction notes and details', words:['general note','construction note','detail','details','typical']},
+        {label:'doors, windows, and openings', words:['door','doors','window','windows','opening','openings']},
+        {label:'roof slopes and drainage', words:['roof','slope','fall','gutter','downpipe','drainage']},
+        {label:'structure and reinforcement', words:['reinforcement','rebar','beam','column','footing','foundation','slab']},
+        {label:'services and equipment', words:['electrical','lighting','plumbing','hydraulic','mechanical','hvac','equipment']},
+        {label:'site access and external works', words:['site access','boundary','setback','paving','landscape','external works']},
+        {label:'demolition and existing work', words:['demolition','remove existing','existing condition','make good']}
+      ];
+      const CHECKLIST = [
+        ['Set control', 'Set information and commercial basis', [
+          ['Project identity recorded', 'Name, location, client, estimator, issue/tender date, and currency are recorded.'],
+          ['Complete set received', 'Drawing package, specifications, addenda, and referenced reports are available.'],
+          ['Latest revision identified', 'Issue number/date and superseded information are identified.'],
+          ['Scope boundaries recorded', 'Inclusions, exclusions, alternates, provisional sums, and owner-supplied items are noted.'],
+          ['Pricing basis recorded', 'Tax, escalation, estimate validity, labor basis, and rate date are stated.'],
+          ['Document register checked', 'Page count, sheet numbers, drawing schedule, and missing documents are reviewed.']
+        ]],
+        ['Drawing review', 'Confirm what the documents actually show', [
+          ['Scale and units checked', 'Scale, units, north/orientation, and any not-to-scale notes are verified.'],
+          ['Site constraints reviewed', 'Boundary, access, setbacks, levels, existing conditions, and working space are reviewed.'],
+          ['Plans reconciled', 'Floor plans agree with areas, room schedules, elevations, and sections.'],
+          ['Heights and levels confirmed', 'Elevations, sections, roof lines, ceiling heights, and level changes are checked.'],
+          ['Details and schedules checked', 'Details, legends, door/window schedules, finish schedules, and notes are reviewed.'],
+          ['Structural information reviewed', 'Foundation, slab, framing, reinforcement, structural notes, and details are included.'],
+          ['MEP and fire interfaces reviewed', 'Services, penetrations, equipment, fire/life safety, and coordination requirements are included.'],
+          ['Existing/demolition work reviewed', 'Demolition, protection, temporary works, and make-good requirements are captured.']
+        ]],
+        ['Scope capture', 'Walk the estimate by work package', [
+          ['Preliminaries and mobilization', 'Permits, supervision, temporary facilities, protection, mobilization, and demobilization.'],
+          ['Sitework and demolition', 'Clearing, demolition, excavation, fill, hauling, disposal, and site preparation.'],
+          ['Substructure', 'Foundations, footings, piles, slabs, retaining elements, waterproofing, and below-grade works.'],
+          ['Structure and framing', 'Concrete, reinforcement, steel, masonry, timber, framing, beams, columns, and supports.'],
+          ['Envelope and roof', 'Roofing, waterproofing, cladding, insulation, doors, windows, and sealants.'],
+          ['Interiors and finishes', 'Partitions, ceilings, flooring, painting, joinery, fixtures, and equipment.'],
+          ['External works', 'Paving, fences, drainage, utilities, landscape, roads, curbs, and reinstatement.'],
+          ['Services and commissioning', 'Mechanical, electrical, plumbing/hydraulic, fire, testing, commissioning, and handover.']
+        ]],
+        ['Takeoff quality', 'Make every quantity traceable', [
+          ['Source reference on each line', 'Each quantity points to a sheet, page, detail, schedule, specification, or field record.'],
+          ['Dimensions cross-checked', 'Dimensions, scale, areas, perimeters, levels, and counts are checked.'],
+          ['Openings and overlaps checked', 'Voids, openings, overlaps, and duplicate scope are removed or documented.'],
+          ['Waste and laps recorded', 'Waste, laps, cuts, and overage are shown separately from net quantities.'],
+          ['Units are consistent', 'Units, conversions, and decimal precision are consistent throughout the takeoff.'],
+          ['Exact vs allowance separated', 'Measured quantities are not mixed with assumptions, provisional quantities, or allowances.'],
+          ['Conflicts logged', 'Drawing/specification conflicts, unclear notes, and missing details are recorded for RFI.'],
+          ['Totals reconciled', 'Quantities are checked against schedules, typical units, areas, and overall project totals.']
+        ]],
+        ['Pricing and BOQ', 'Build a defensible price', [
+          ['Material rate basis recorded', 'Supplier, quote date, brand/specification, delivery, and validity are recorded.'],
+          ['Labor productivity recorded', 'Crew composition, productivity, work hours, and wage basis are stated.'],
+          ['Plant and access considered', 'Equipment, lifting, access, temporary works, haulage, and disposal are included where needed.'],
+          ['Subcontractor coverage checked', 'Trade packages, quotes, gaps, and quote comparisons are documented.'],
+          ['Commercial additions checked', 'Waste, taxes, overhead, profit, contingency, insurance, and escalation are addressed.'],
+          ['Alternates and exclusions marked', 'Alternates, provisional sums, exclusions, and owner-supplied items are unmistakable.'],
+          ['Arithmetic checked', 'Extensions, subtotals, unit-rate builds, and final totals have been checked.']
+        ]],
+        ['Constructability and risk', 'Test the estimate against real execution', [
+          ['Site logistics reviewed', 'Access, storage, traffic, neighbors, laydown, and working space are considered.'],
+          ['Sequence and temporary support reviewed', 'Construction sequence, temporary support, dewatering, and protection are considered.'],
+          ['Long-lead items identified', 'Procurement lead times, approvals, samples, and substitutions are identified.'],
+          ['Safety and permits identified', 'Permits, inspections, code obligations, testing, and safety controls are recorded.'],
+          ['Ground/weather risk recorded', 'Ground conditions, weather exposure, water, and seasonal risks are addressed.'],
+          ['RFIs and unknowns assigned', 'Open questions have an owner, required response, and effect on cost or schedule.'],
+          ['QA/QC and testing included', 'Inspection, testing, commissioning, records, and corrective work are considered.']
+        ]],
+        ['Final issue', 'Make the estimate easy to audit', [
+          ['Estimate agrees with scope', 'Takeoff, BOQ, estimate, assumptions, exclusions, and clarifications are aligned.'],
+          ['Unresolved flags are visible', 'Review items and limitations are carried into the final package.'],
+          ['Files and revisions are controlled', 'File names, revision/date, source set, and issue record are complete.'],
+          ['Final package assembled', 'TOC, takeoff, BOQ, pricing basis, assumptions, exclusions, RFIs, and risk notes are included.'],
+          ['Independent review completed', 'A second pass or independent check has been completed for key quantities and totals.']
+        ]]
+      ];
+      const CONTENT_FIELDS = [
+        ['scope', 'Scope summary', 'What is being priced? Describe the work, project type, location, and major work packages.'],
+        ['basis', 'Drawing / specification basis', 'List the drawing set, revision/date, specifications, reports, addenda, and site information used.'],
+        ['assumptions', 'Assumptions and allowances', 'Record anything not fully shown: dimensions, productivity, waste, provisional quantities, design development, or access.'],
+        ['exclusions', 'Exclusions / owner-supplied items', 'State work, materials, taxes, permits, design, testing, or owner-supplied items not included.'],
+        ['rfis', 'Clarifications / RFIs', 'Question, source reference, responsible party, due date, response, and cost/schedule impact.'],
+        ['risks', 'Risks and constructability', 'Access, ground, weather, sequencing, temporary works, long-lead items, safety, and coordination risks.'],
+        ['rates', 'Pricing basis', 'Rate source/date, supplier or subcontractor, labor crew/productivity, equipment, delivery, tax, overhead, profit, and contingency.'],
+        ['changes', 'Revision / change log', 'Date, revision, changed sheets/scope, affected quantities, pricing impact, and reviewer.']
+      ];
+      const SCOPE_PACKAGES = [
+        ['preliminaries','Preliminaries / mobilization',['preliminaries','mobilization','temporary facilities','supervision','permits']],['demolition','Demolition / removal',['demolition','removal','strip out','disposal','hauling']],['earthworks','Earthworks / site preparation',['earthworks','excavation','backfill','grading','site preparation']],['concrete','Concrete / foundations',['concrete','footing','foundation','slab','formwork']],['reinforcement','Reinforcement',['reinforcement','rebar','reinforcing steel']],['structural','Structural framing',['structural framing','structural steel','beam','column','truss']],['masonry','Masonry / partitions',['masonry','chb','blockwork','partition']],['roofing','Roofing / waterproofing',['roof','roofing','waterproofing','flashing','gutter']],['openings','Doors / windows / glazing',['door','window','glazing','hardware']],['finishes','Architectural finishes',['finish','flooring','ceiling','painting','tile']],['plumbing','Plumbing / sanitary',['plumbing','sanitary','water line','sewer']],['electrical','Electrical / lighting',['electrical','lighting','power','wiring']],['mechanical','Mechanical / HVAC',['mechanical','hvac','air conditioning','ventilation']],['fire','Fire / life safety',['fire protection','sprinkler','fire alarm','life safety']],['external','External works / drainage',['external works','drainage','paving','curb','fence','landscape']],['testing','Testing / commissioning',['testing','commissioning','inspection','handover']]
+      ];
+      const ROADMAP_BASE = [
+        {key:'control', step:'1', phase:'Document control', title:'Confirm project and estimate basis', purpose:'Record the project identity, location, client, revision, scope boundaries, currency, tax, and pricing basis.', outputs:'Project record · scope boundaries · estimate assumptions', status:'Not started'},
+        {key:'register', step:'2', phase:'Document review', title:'Build and verify the drawing register', purpose:'Review every physical page, sheet number, title, discipline, revision, and unresolved document flag.', outputs:'Verified table of contents · missing/ambiguous sheet list', status:'Not started'},
+        {key:'scope-map', step:'3', phase:'Scope mapping', title:'Map drawings to work packages', purpose:'Link each drawing discipline to the work packages that may need pricing, coordination, or clarification.', outputs:'Scope matrix · drawing-to-trade references', status:'Not started'},
+        {key:'takeoff', step:'4', phase:'Quantity takeoff', title:'Prepare the measurable takeoff / BOQ', purpose:'Measure or count each scope item, separate net quantities from waste and allowances, and retain a source reference.', outputs:'Takeoff · BOQ · source-sheet references', status:'Not started'},
+        {key:'pricing', step:'5', phase:'Pricing', title:'Collect rates and build pricing', purpose:'Obtain material, labor, equipment, and subcontractor rates with dates, sources, productivity, delivery, and validity.', outputs:'Rate build-up · quote comparison · pricing basis', status:'Not started'},
+        {key:'risk', step:'6', phase:'Constructability', title:'Check sequence, interfaces, and risk', purpose:'Review access, temporary works, long-lead items, safety, testing, MEP interfaces, ground conditions, and RFIs.', outputs:'Risk register · RFI list · constructability notes', status:'Not started'},
+        {key:'review', step:'7', phase:'Estimate review', title:'Reconcile quantities and commercial totals', purpose:'Check extensions, subtotals, scope coverage, trade gaps, allowances, exclusions, overhead, profit, contingency, and escalation.', outputs:'Checked estimate · reconciliation notes · unresolved flags', status:'Not started'},
+        {key:'issue', step:'8', phase:'Final issue', title:'Assemble and issue the estimate package', purpose:'Combine the register, takeoff, BOQ, pricing basis, assumptions, exclusions, clarifications, risk notes, and final review record.', outputs:'Auditable estimate package · revision-controlled issue', status:'Not started'}
+      ];
+      const ROADMAP_SCOPE_RULES = [
+        {key:'architectural', discipline:'Architectural', step:'4A', phase:'Scope takeoff', title:'Review architectural scope', purpose:'Identify areas, rooms, openings, finishes, elevations, details, and architectural work packages requiring measurement or allowance.', outputs:'Architectural scope checklist · area/opening/finish references'},
+        {key:'structural', discipline:'Structural', step:'4B', phase:'Scope takeoff', title:'Review structural scope', purpose:'Identify foundations, slabs, concrete, reinforcement, steel, masonry, framing, connections, and structural details requiring takeoff.', outputs:'Structural scope checklist · member/detail references'},
+        {key:'civil-site', discipline:'Civil / Site', step:'4C', phase:'Scope takeoff', title:'Review civil and site scope', purpose:'Identify demolition, earthworks, levels, drainage, utilities, paving, curbs, access, external works, and reinstatement requirements.', outputs:'Civil/site scope checklist · sitework references'},
+        {key:'services', discipline:'Services', step:'4D', phase:'Scope takeoff', title:'Review services and life-safety scope', purpose:'Coordinate mechanical, electrical, plumbing/hydraulic, fire, communications, security, testing, and commissioning requirements.', outputs:'Services interface checklist · equipment/service references'}
+      ];
+
+      function uid(prefix='id') { return prefix + '-' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4); }
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      }
+      function cleanText(text) {
+        return String(text || '').replace(/\s+/g, ' ').replace(/[|]+/g, ' ').trim();
+      }
+      function titleCase(text) {
+        return String(text || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase()).replace(/\bAnd\b/g, 'and').replace(/\bOf\b/g, 'of').replace(/\bThe\b/g, 'the');
+      }
+      function saveState(message='Saved locally') {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.project)); } catch (err) { /* private mode or blocked storage */ }
+        $('saveStatus').textContent = message;
+      }
+      function folderApiAvailable() { return typeof window.showDirectoryPicker === 'function'; }
+      function normalizeProjectFiles() {
+        if (!Array.isArray(state.project.files)) state.project.files = [];
+        state.project.files = state.project.files.map(file => typeof file === 'string' ? {name:file, kind:'file', savedAt:''} : ({name:String(file.name || ''), kind:String(file.kind || 'file'), savedAt:String(file.savedAt || '')})).filter(file => file.name);
+      }
+      function folderDateStamp(date=new Date()) {
+        const pad=value => String(value).padStart(2,'0');
+        return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+      }
+      function safeFolderPart(value, fallback) {
+        return String(value || fallback).replace(/[<>:"/\\|?*\u0000-\u001F]/g, '_').replace(/\s+/g, ' ').replace(/[. ]+$/g, '').trim() || fallback;
+      }
+      function buildProjectFolderName() {
+        return safeFolderPart(state.project.name, 'Untitled Project') + '_' + safeFolderPart(state.project.location, 'Client') + ' - ' + folderDateStamp();
+      }
+      function setFolderStatus(message, kind='warn') {
+        const status=$('folderStatus');
+        if (status) status.textContent=message;
+        const dot=status?.previousElementSibling;
+        if (dot) dot.className='dot' + (kind === 'ready' ? '' : ' warn');
+      }
+      function updateFolderUi() {
+        normalizeProjectFiles();
+        const name=state.project.folderName || buildProjectFolderName();
+        if ($('projectFolderName')) $('projectFolderName').textContent=name;
+        if (fileSystemState.projectHandle) setFolderStatus('Project folder ready. New source files and outputs will be saved there.', 'ready');
+        else if (fileSystemState.parentHandle) setFolderStatus('Parent folder selected. Create the project folder to begin saving files.');
+        else if (!folderApiAvailable()) setFolderStatus('Folder saving needs Chrome or Edge. Browser downloads remain available.');
+        else setFolderStatus('Choose a parent folder to create the project folder.');
+      }
+      function openHandleDb() {
+        if (!window.indexedDB) return Promise.resolve(null);
+        return new Promise((resolve, reject) => {
+          const request=window.indexedDB.open(HANDLE_DB_NAME, 1);
+          request.onupgradeneeded=()=>{ if (!request.result.objectStoreNames.contains(HANDLE_STORE_NAME)) request.result.createObjectStore(HANDLE_STORE_NAME); };
+          request.onsuccess=()=>resolve(request.result);
+          request.onerror=()=>reject(request.error || new Error('Could not open folder-handle storage.'));
+        });
+      }
+      async function saveParentHandle(handle) {
+        const db=await openHandleDb();
+        if (!db) return;
+        await new Promise((resolve,reject)=>{ const tx=db.transaction(HANDLE_STORE_NAME,'readwrite'); tx.objectStore(HANDLE_STORE_NAME).put(handle,'parent'); tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error); });
+        db.close();
+      }
+      async function readParentHandle() {
+        const db=await openHandleDb();
+        if (!db) return null;
+        const handle=await new Promise((resolve,reject)=>{ const tx=db.transaction(HANDLE_STORE_NAME,'readonly'); const request=tx.objectStore(HANDLE_STORE_NAME).get('parent'); request.onsuccess=()=>resolve(request.result || null); request.onerror=()=>reject(request.error); });
+        db.close();
+        return handle;
+      }
+      async function folderPermission(handle, allowPrompt=false) {
+        if (!handle) return false;
+        try {
+          if (typeof handle.queryPermission === 'function') {
+            const current=await handle.queryPermission({mode:'readwrite'});
+            if (current === 'granted') return true;
+            if (!allowPrompt) return false;
+          }
+          if (typeof handle.requestPermission === 'function') return (await handle.requestPermission({mode:'readwrite'})) === 'granted';
+          return true;
+        } catch (err) { return false; }
+      }
+      async function ensureProjectFolder({prompt=true}={}) {
+        if (fileSystemState.projectHandle) return true;
+        if (!folderApiAvailable()) { updateFolderUi(); return false; }
+        let parent=fileSystemState.parentHandle;
+        if (!parent) {
+          try { parent=await readParentHandle(); } catch (err) { parent=null; }
+          if (parent && await folderPermission(parent, false)) fileSystemState.parentHandle=parent;
+          else parent=null;
+        }
+        if (!parent && prompt) {
+          try { parent=await window.showDirectoryPicker({mode:'readwrite'}); } catch (err) { setFolderStatus('Parent-folder selection was cancelled.'); return false; }
+          if (!await folderPermission(parent, true)) { setFolderStatus('Write access was not granted for the selected folder.'); return false; }
+          fileSystemState.parentHandle=parent;
+          try { await saveParentHandle(parent); } catch (err) { /* handle persistence is optional */ }
+        }
+        if (!parent) { updateFolderUi(); return false; }
+        if (!await folderPermission(parent, prompt)) { setFolderStatus('The selected parent folder needs write permission before files can be saved.'); return false; }
+        const folderName=state.project.folderName || buildProjectFolderName();
+        try {
+          fileSystemState.projectHandle=await parent.getDirectoryHandle(folderName,{create:true});
+          state.project.folderName=folderName;
+          state.project.folderCreatedAt=state.project.folderCreatedAt || new Date().toISOString();
+          normalizeProjectFiles();
+          saveState('Project folder ready');
+          updateFolderUi();
+          return true;
+        } catch (err) {
+          console.error(err);
+          setFolderStatus('Could not create the project folder: ' + (err.message || 'unknown error'));
+          return false;
+        }
+      }
+      async function chooseParentFolder() {
+        if (!folderApiAvailable()) { showToast('Use Chrome or Edge to create a real project folder'); updateFolderUi(); return false; }
+        try {
+          const parent=await window.showDirectoryPicker({mode:'readwrite'});
+          if (!await folderPermission(parent,true)) { setFolderStatus('Write access was not granted for the selected folder.'); return false; }
+          fileSystemState.parentHandle=parent; fileSystemState.projectHandle=null;
+          try { await saveParentHandle(parent); } catch (err) { /* handle persistence is optional */ }
+          const ready=await ensureProjectFolder({prompt:false});
+          if (ready) showToast('Project folder ready: ' + state.project.folderName);
+          return ready;
+        } catch (err) {
+          setFolderStatus('Parent-folder selection was cancelled.');
+          return false;
+        }
+      }
+      async function createProjectFolder() {
+        const ready=await ensureProjectFolder({prompt:true});
+        if (ready) showToast('Project folder ready: ' + state.project.folderName);
+        return ready;
+      }
+      function recordProjectFile(name, kind='output') {
+        normalizeProjectFiles();
+        const existing=state.project.files.find(file => file.name === name);
+        const record={name, kind, savedAt:new Date().toISOString()};
+        if (existing) Object.assign(existing,record); else state.project.files.push(record);
+      }
+      function mimeForFile(name) {
+        const ext=String(name || '').split('.').pop().toLowerCase();
+        return ({pdf:'application/pdf',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xls:'application/vnd.ms-excel',csv:'text/csv',json:'application/json',txt:'text/plain',html:'text/html;charset=utf-8'})[ext] || 'application/octet-stream';
+      }
+      async function writeBlobToProjectFolder(name, blob, kind='output', prompt=false) {
+        if (!await ensureProjectFolder({prompt})) return false;
+        try {
+          const fileHandle=await fileSystemState.projectHandle.getFileHandle(name,{create:true});
+          const writable=await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          recordProjectFile(name,kind);
+          saveState('Saved ' + name + ' to project folder');
+          updateFolderUi();
+          return true;
+        } catch (err) {
+          console.error(err);
+          setFolderStatus('Folder write failed for ' + name + '. A browser download will be used instead.');
+          return false;
+        }
+      }
+      async function saveInputFileToProjectFolder(file, kind='source input') {
+        if (!file || typeof file.arrayBuffer !== 'function') return false;
+        try {
+          const bytes=await file.arrayBuffer();
+          const blob=new Blob([bytes],{type:file.type || mimeForFile(file.name)});
+          return await writeBlobToProjectFolder(file.name,blob,kind,true);
+        } catch (err) {
+          console.error(err);
+          setFolderStatus('Could not copy ' + file.name + ' into the project folder.');
+          return false;
+        }
+      }
+      async function saveLabeledPdf() {
+        const file=$('editedPdfInput').files[0];
+        if (!file) { showToast('Choose the edited PDF first'); return; }
+        try {
+          const bytes=await file.arrayBuffer();
+          const blob=new Blob([bytes],{type:'application/pdf'});
+          const filename='Labeled, annotated.pdf';
+          const saved=await writeBlobToProjectFolder(filename,blob,'edited/annotated PDF',true);
+          if (!saved) triggerBrowserDownload(filename,blob);
+          showToast(saved ? 'Labeled, annotated.pdf saved to project folder' : 'Labeled, annotated.pdf downloaded');
+        } catch (err) {
+          console.error(err);
+          showToast('Could not save the edited PDF');
+        }
+      }
+      function setViewerStatus(message, ready=false) {
+        if ($('viewerStatus')) $('viewerStatus').textContent=message;
+        const dot=$('viewerStatus')?.previousElementSibling;
+        if (dot) dot.className='dot' + (ready ? '' : ' warn');
+      }
+      function viewerDrawingForPage(pageNumber) {
+        return (state.project.sheets || []).find(sheet => Number(sheet.page) === Number(pageNumber)) || null;
+      }
+      function updateViewerMetadata() {
+        const drawing=viewerDrawingForPage(viewerState.page);
+        $('viewerDrawingTitle').textContent=drawing?.title || drawing?.label || 'Unidentified drawing page';
+        $('viewerSheetMeta').textContent='Sheet ' + (drawing?.sheet || '—') + ' · PDF page ' + viewerState.page;
+        $('viewerPageSummary').textContent=drawing?.summary || 'No page summary is available for this physical PDF page.';
+        $('viewerDrawingMeta').innerHTML='Discipline ' + escapeHtml(drawing?.discipline || '—') + '<br />Revision ' + escapeHtml(drawing?.revision || '—') + '<br />Scale ' + escapeHtml(drawing?.scale || '—') + (drawing?.drawingDate ? '<br />Date ' + escapeHtml(drawing.drawingDate) : '');
+        $('viewerEvidence').textContent=drawing?.evidence || 'No embedded-text evidence is available.';
+      }
+      function setViewerPdf(pdf, fileName) {
+        viewerState.pdf=pdf;
+        viewerState.fileName=fileName || state.project.sourceFile || '';
+        viewerState.page=Math.min(Math.max(1,viewerState.page),pdf.numPages);
+        $('viewerPageCount').textContent=pdf.numPages;
+        $('viewerPageInput').max=pdf.numPages;
+        $('viewerPageInput').value=viewerState.page;
+        $('viewerEmpty').classList.add('hidden');
+        $('pdfViewerCanvas').classList.remove('hidden');
+        setViewerStatus('Loaded ' + viewerState.fileName + ' · ' + pdf.numPages + ' PDF page(s).',true);
+        updateViewerMetadata();
+      }
+      async function loadViewerPdfFile(file, {render=true}={}) {
+        if (!file) throw new Error('Choose the source PDF first.');
+        if (!window.pdfjsLib) throw new Error('PDF viewer library did not load.');
+        setViewerStatus('Loading ' + file.name + '…');
+        const bytes=new Uint8Array(await file.arrayBuffer());
+        const pdf=await window.pdfjsLib.getDocument({data:bytes,disableWorker:true}).promise;
+        setViewerPdf(pdf,file.name);
+        if (render) await renderViewerPage(viewerState.page);
+        return pdf;
+      }
+      async function renderViewerPage(pageNumber=viewerState.page) {
+        if (!viewerState.pdf) { setViewerStatus('Load the original source PDF to open this page.');updateViewerMetadata();return; }
+        if (viewerState.renderTask) { try { viewerState.renderTask.cancel(); } catch (err) { /* prior render already finished */ } viewerState.renderTask=null; }
+        const token=++viewerState.renderToken;
+        viewerState.page=Math.min(Math.max(1,Number(pageNumber)||1),viewerState.pdf.numPages);
+        $('viewerPageInput').value=viewerState.page;
+        $('viewerPrevBtn').disabled=viewerState.page <= 1;
+        $('viewerNextBtn').disabled=viewerState.page >= viewerState.pdf.numPages;
+        setViewerStatus('Rendering PDF page ' + viewerState.page + '…');
+        const page=await viewerState.pdf.getPage(viewerState.page);
+        if (token !== viewerState.renderToken) return;
+        const displayViewport=page.getViewport({scale:viewerState.scale});
+        let pixelRatio=Math.min(2,Math.max(1,window.devicePixelRatio || 1));
+        const maxRenderPixels=24000000;
+        if (displayViewport.width * displayViewport.height * pixelRatio * pixelRatio > maxRenderPixels) pixelRatio=Math.max(.5,Math.sqrt(maxRenderPixels / (displayViewport.width * displayViewport.height)));
+        const renderViewport=page.getViewport({scale:viewerState.scale * pixelRatio});
+        const canvas=$('pdfViewerCanvas');
+        const context=canvas.getContext('2d',{alpha:false});
+        canvas.width=Math.ceil(renderViewport.width);
+        canvas.height=Math.ceil(renderViewport.height);
+        canvas.style.width=Math.ceil(displayViewport.width) + 'px';
+        canvas.style.height=Math.ceil(displayViewport.height) + 'px';
+        const renderTask=page.render({canvasContext:context,viewport:renderViewport});
+        viewerState.renderTask=renderTask;
+        try { await renderTask.promise; } catch (err) { if (err?.name === 'RenderingCancelledException') return; throw err; }
+        if (viewerState.renderTask === renderTask) viewerState.renderTask=null;
+        if (token !== viewerState.renderToken) return;
+        $('viewerZoomText').textContent=Math.round(viewerState.scale * 100) + '%';
+        updateViewerMetadata();
+        setViewerStatus('Showing ' + (viewerState.fileName || 'source PDF') + ' · physical PDF page ' + viewerState.page + '.',true);
+      }
+      async function goToViewerPage(pageNumber) {
+        viewerState.page=Math.max(1,Number(pageNumber)||1);
+        switchTab('viewer');
+        await renderViewerPage(viewerState.page);
+      }
+      async function fitViewerWidth() {
+        if (!viewerState.pdf) { setViewerStatus('Load the source PDF before fitting the page.');return; }
+        const page=await viewerState.pdf.getPage(viewerState.page);
+        const base=page.getViewport({scale:1});
+        const available=Math.max(320,$('viewerCanvasWrap').clientWidth - 38);
+        viewerState.scale=Math.min(3,Math.max(.2,available / base.width));
+        await renderViewerPage(viewerState.page);
+      }
+      function viewerApplicationTarget(pageNumber) {
+        try {
+          const url=new URL(window.location.href);
+          if (!['http:','https:','file:'].includes(url.protocol)) return '';
+          url.hash='';
+          url.searchParams.set('viewer','1');
+          url.searchParams.set('page',String(Math.max(1,Number(pageNumber)||1)));
+          return url.href;
+        } catch (err) { return ''; }
+      }
+      async function tryLoadViewerFromProjectFolder() {
+        if (viewerState.pdf || !fileSystemState.projectHandle || !/\.pdf$/i.test(state.project.sourceFile || '')) return false;
+        try {
+          const handle=await fileSystemState.projectHandle.getFileHandle(state.project.sourceFile);
+          const file=await handle.getFile();
+          await loadViewerPdfFile(file,{render:viewerState.requested});
+          return true;
+        } catch (err) { return false; }
+      }
+      async function restoreFileSystemHandles() {
+        if (!folderApiAvailable()) { updateFolderUi(); return; }
+        try {
+          const parent=await readParentHandle();
+          if (!parent || !await folderPermission(parent,false)) { updateFolderUi(); return; }
+          fileSystemState.parentHandle=parent;
+          if (state.project.folderName) {
+            try { fileSystemState.projectHandle=await parent.getDirectoryHandle(state.project.folderName); } catch (err) { /* the folder may have been moved or deleted */ }
+          }
+          updateFolderUi();
+          await tryLoadViewerFromProjectFolder();
+        } catch (err) { updateFolderUi(); }
+      }
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) state.project = {...state.project, ...JSON.parse(raw)};
+        } catch (err) { /* start fresh */ }
+        if (!Array.isArray(state.project.sheets)) state.project.sheets = [];
+        if (!Array.isArray(state.project.checklist) || !state.project.checklist.length) state.project.checklist = makeChecklistState();
+        if (!state.project.content || typeof state.project.content !== 'object') state.project.content = {};
+        if (!Array.isArray(state.project.roadmap)) state.project.roadmap = [];
+        normalizeProjectFiles();
+        ensureTimeEntries();
+      }
+      function syncProjectFields() {
+        $('projectName').value = state.project.name || '';
+        $('projectLocation').value = state.project.location || '';
+        $('projectRevision').value = state.project.revision || '';
+        $('estimator').value = state.project.estimator || '';
+      }
+      function bindProjectFields() {
+        [['projectName','name'],['projectLocation','location'],['projectRevision','revision'],['estimator','estimator']].forEach(([id,key]) => {
+          $(id).addEventListener('input', e => { state.project[key] = e.target.value; saveState(); updateFolderUi(); });
+        });
+      }
+      function makeChecklistState() {
+        return CHECKLIST.flatMap(([section, description, items]) => items.map(([title, prompt]) => ({id:uid('check'), section, description, title, prompt, done:false, note:''})));
+      }
+      function makeContentState() {
+        return Object.fromEntries(CONTENT_FIELDS.map(([key]) => [key, '']));
+      }
+      function makeScopeBriefState() { return {raw:'',included:'',excluded:'',clarifications:'',strict:true,sourceFile:'',gate:[]}; }
+      function ensureScopeBrief() { state.project.scopeBrief={...makeScopeBriefState(),...(state.project.scopeBrief||{})};if(!Array.isArray(state.project.scopeBrief.gate))state.project.scopeBrief.gate=[]; }
+      function splitScopeSections(text) { const result={included:[],excluded:[],clarifications:[]};let section='included';String(text||'').replace(/\b(exclude(?:d|s)?|not included|do not include|out of scope)\b/gi,'\n$1 ').replace(/\b(include(?:d|s)?|inclusions?)\b/gi,'\n$1 ').split(/\r?\n|(?<=[.;])\s+/).forEach(raw=>{const line=raw.trim();if(!line)return;const heading=line.replace(/[:\-–—]+$/,'').toLowerCase();if(/^(exclude|excluded|exclusions|not included|out of scope)$/.test(heading)){section='excluded';return;}if(/^(include|included|inclusions|scope|scope of work)$/.test(heading)){section='included';return;}if(/^(clarification|clarifications|rfi|rfis|questions|undecided)$/.test(heading)){section='clarifications';return;}const cleaned=line.replace(/^[-*•\d.)\s]+/,'').trim();if(/^(exclude|excluded|exclusions|not included|do not include|out of scope)\b/i.test(cleaned)){section='excluded';result.excluded.push(cleaned.replace(/^(exclude|excluded|exclusions|not included|do not include|out of scope)\b[:\s-]*/i,''));}else if(/^(include|included|inclusions)\b/i.test(cleaned)){section='included';result.included.push(cleaned.replace(/^(include|included|inclusions)\b[:\s-]*/i,''));}else result[section].push(cleaned);});return result; }
+      function scopeTextMatch(text,terms){const hay=String(text||'').toLowerCase();return terms.some(term=>hay.includes(term));}
+      function buildScopeGate(){ensureScopeBrief();const s=state.project.scopeBrief;s.gate=SCOPE_PACKAGES.map(([key,label,terms])=>{const prior=s.gate.find(x=>x.key===key);const excluded=scopeTextMatch(s.excluded,terms);const included=scopeTextMatch(s.included,terms)||scopeTextMatch(s.raw,terms)&&!excluded;const decision=excluded?'Rejected':included?'Included':s.strict?'Hold / clarify':'Review';return{key,label,decision:prior?.manual?prior.decision:decision,reason:excluded?'Matched exclusion':included?'Matched inclusion':'Not explicitly included',manual:prior?.manual||false};});}
+      function applyScopeBrief(){ensureScopeBrief();const s=state.project.scopeBrief;s.raw=$('scopeBriefInput').value.trim();s.strict=$('strictScopeMode').checked;const parsed=splitScopeSections(s.raw);if(!$('scopeIncluded').value.trim())$('scopeIncluded').value=parsed.included.join('\n');if(!$('scopeExcluded').value.trim())$('scopeExcluded').value=parsed.excluded.join('\n');if(!$('scopeClarifications').value.trim())$('scopeClarifications').value=parsed.clarifications.join('\n');s.included=$('scopeIncluded').value.trim();s.excluded=$('scopeExcluded').value.trim();s.clarifications=$('scopeClarifications').value.trim();state.project.content={...makeContentState(),...(state.project.content||{}),scope:s.included,exclusions:s.excluded,rfis:s.clarifications};buildScopeGate();saveState('Scope brief applied');renderScopeGate();renderContent();$('scopeStatus').textContent='Scope applied · '+s.gate.filter(x=>x.decision==='Included').length+' included · '+s.gate.filter(x=>x.decision==='Rejected').length+' rejected · '+s.gate.filter(x=>x.decision.startsWith('Hold')).length+' on hold.';showToast('Strict scope gate updated');}
+      async function loadScopeBriefFile(){const file=$('scopeBriefFileInput').files[0];if(!file){showToast('Choose a TXT, MD, or JSON brief first');return;}let text='';if(file.name.toLowerCase().endsWith('.json')){const data=JSON.parse(await file.text());text=data.scope_brief||data.brief||data.scope||data.request||JSON.stringify(data,null,2);}else text=await file.text();$('scopeBriefInput').value=text;state.project.scopeBrief={...makeScopeBriefState(),...(state.project.scopeBrief||{}),sourceFile:file.name};$('scopeStatus').textContent='Loaded '+file.name+'. Press Apply scope brief.';showToast('Scope brief loaded');}
+      function renderScopeGate(){ensureScopeBrief();const root=$('scopeGateRoot');if(!state.project.scopeBrief.gate.length)buildScopeGate();root.innerHTML=`<table><thead><tr><th>Work package</th><th>Decision</th><th>Reason</th></tr></thead><tbody>${state.project.scopeBrief.gate.map(x=>`<tr data-scope-key="${escapeHtml(x.key)}"><td><strong>${escapeHtml(x.label)}</strong></td><td><select class="row-input" data-scope-decision><option ${x.decision==='Included'?'selected':''}>Included</option><option ${x.decision==='Rejected'?'selected':''}>Rejected</option><option ${x.decision==='Hold / clarify'?'selected':''}>Hold / clarify</option><option ${x.decision==='Review'?'selected':''}>Review</option></select></td><td>${escapeHtml(x.reason)}</td></tr>`).join('')}</tbody></table>`;root.querySelectorAll('[data-scope-decision]').forEach(el=>el.addEventListener('change',e=>{const item=state.project.scopeBrief.gate.find(x=>x.key===e.target.closest('[data-scope-key]').dataset.scopeKey);item.decision=e.target.value;item.reason='Manual override';item.manual=true;saveState('Scope decision saved');renderScopeGate();}));}
+      function syncScopeFields(){ensureScopeBrief();const s=state.project.scopeBrief;$('scopeBriefInput').value=s.raw;$('scopeIncluded').value=s.included;$('scopeExcluded').value=s.excluded;$('scopeClarifications').value=s.clarifications;$('strictScopeMode').checked=s.strict!==false;}
+      function makeScopeText(){ensureScopeBrief();const s=state.project.scopeBrief;const lines=['IO Wisp — Strict Scope Gate',state.project.name||'Untitled project','','INCLUDED',s.included||'[None stated]','','REJECTED / EXCLUDED',s.excluded||'[None stated]','','CLARIFICATIONS',s.clarifications||'[None]','','WORK PACKAGE DECISIONS'];s.gate.forEach(x=>lines.push(x.decision+'\t'+x.label+'\t'+x.reason));return lines.join('\n');}
+      const ROADMAP_STATUSES = ['Not started', 'In progress', 'Ready for review', 'Complete', 'Blocked'];
+      function roadmapTemplates() {
+        const disciplines = new Set((state.project.sheets || []).map(s => s.discipline));
+        const has = (...values) => values.some(value => disciplines.has(value));
+        const scopeRows = ROADMAP_SCOPE_RULES.filter(rule => {
+          if (rule.key === 'architectural') return has('Architectural');
+          if (rule.key === 'structural') return has('Structural');
+          if (rule.key === 'civil-site') return has('Civil / Site');
+          if (rule.key === 'services') return has('Mechanical', 'Electrical', 'Plumbing / Hydraulic', 'Fire / Life Safety');
+          return false;
+        }).map(rule => ({...rule, status:'Not started'}));
+        return [...ROADMAP_BASE.slice(0, 3), ...scopeRows, ...ROADMAP_BASE.slice(3)];
+      }
+      function makeRoadmapState() {
+        return roadmapTemplates().map(item => ({...item, reference:'', notes:''}));
+      }
+      function refreshRoadmap() {
+        const existing = new Map((Array.isArray(state.project.roadmap) ? state.project.roadmap : []).map(item => [item.key, item]));
+        state.project.roadmap = roadmapTemplates().map(template => {
+          const prior = existing.get(template.key) || {};
+          return {...template, reference:String(prior.reference || ''), notes:String(prior.notes || ''), status:ROADMAP_STATUSES.includes(prior.status) ? prior.status : template.status};
+        });
+      }
+      function ensureTimeEntries() {
+        if (!Array.isArray(state.project.timeEntries)) state.project.timeEntries = [];
+        state.project.timeEntries = state.project.timeEntries.map((entry, index) => ({
+          id:entry.id || uid('time') + '-' + index,
+          scope:entry.scope === 'checklist' ? 'checklist' : 'estimate',
+          refId:String(entry.refId || ''),
+          label:String(entry.label || ''),
+          startedAt:String(entry.startedAt || ''),
+          endedAt:String(entry.endedAt || ''),
+          durationSeconds:Number(entry.durationSeconds) || 0,
+          note:String(entry.note || '')
+        }));
+      }
+      function activeTimeEntry() {
+        ensureTimeEntries();
+        return state.project.timeEntries.find(entry => !entry.endedAt) || null;
+      }
+      function secondsForEntry(entry, now=Date.now()) {
+        if (!entry) return 0;
+        const start = new Date(entry.startedAt).getTime();
+        const end = entry.endedAt ? new Date(entry.endedAt).getTime() : now;
+        if (!Number.isFinite(start) || !Number.isFinite(end)) return Math.max(0, Number(entry.durationSeconds) || 0);
+        return Math.max(0, Math.round((end - start) / 1000));
+      }
+      function secondsForScope(scope, refId='') {
+        ensureTimeEntries();
+        return state.project.timeEntries.filter(entry => entry.scope === scope && (!refId || entry.refId === refId)).reduce((sum, entry) => sum + secondsForEntry(entry), 0);
+      }
+      function formatDuration(seconds) {
+        const minutes = Math.max(0, Math.floor((Number(seconds) || 0) / 60));
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return hours ? hours + 'h ' + remainingMinutes + 'm' : remainingMinutes + 'm';
+      }
+      function formatDateTime(iso) {
+        if (!iso) return '—';
+        const date = new Date(iso);
+        if (!Number.isFinite(date.getTime())) return '—';
+        return date.toLocaleString('en-PH', {year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+      }
+      function latestTimeEntry(scope, refId='') {
+        ensureTimeEntries();
+        return state.project.timeEntries.filter(entry => entry.scope === scope && (!refId || entry.refId === refId)).sort((a,b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0] || null;
+      }
+      function timeLabel(scope, refId='') {
+        if (scope === 'estimate') return 'Whole estimate';
+        const item = (state.project.checklist || []).find(entry => entry.id === refId);
+        return item ? item.title : 'Checklist item';
+      }
+      function startTimer(scope, refId='') {
+        ensureTimeEntries();
+        const active = activeTimeEntry();
+        if (active) { showToast('Stop "' + (active.label || 'the active timer') + '" first'); return; }
+        state.project.timeEntries.push({id:uid('time'), scope, refId, label:timeLabel(scope, refId), startedAt:new Date().toISOString(), endedAt:'', durationSeconds:0, note:''});
+        saveState('Timer started'); renderAll(); showToast('Timer started');
+      }
+      function stopTimer(scope, refId='') {
+        ensureTimeEntries();
+        const entry = state.project.timeEntries.find(item => !item.endedAt && item.scope === scope && item.refId === refId);
+        if (!entry) { showToast('No active timer for this task'); return; }
+        entry.endedAt = new Date().toISOString();
+        entry.durationSeconds = secondsForEntry(entry);
+        saveState('Timer stopped'); renderAll(); showToast('Timer stopped · ' + formatDuration(entry.durationSeconds));
+      }
+      function updateTimeDisplays() {
+        ensureTimeEntries();
+        const active = activeTimeEntry();
+        const estimateSeconds = secondsForScope('estimate');
+        const checklistSeconds = secondsForScope('checklist');
+        const totalSeconds = estimateSeconds + checklistSeconds;
+        if ($('estimateTimeStat')) $('estimateTimeStat').textContent = formatDuration(estimateSeconds);
+        if ($('checklistTimeStat')) $('checklistTimeStat').textContent = formatDuration(checklistSeconds);
+        if ($('totalTimeStat')) $('totalTimeStat').textContent = formatDuration(totalSeconds);
+        if ($('activeTimeStat')) $('activeTimeStat').textContent = active ? (active.label || 'Active task') : 'None';
+        if ($('timeStatus')) $('timeStatus').textContent = active ? 'Tracking ' + (active.label || 'active task') + ' · started ' + formatDateTime(active.startedAt) + ' · ' + formatDuration(secondsForEntry(active)) : 'No active timer.';
+        document.querySelectorAll('[data-live-time-id]').forEach(el => { el.textContent = formatDuration(secondsForScope('checklist', el.dataset.liveTimeId)); });
+        document.querySelectorAll('[data-time-duration]').forEach(el => { const entry = state.project.timeEntries.find(item => item.id === el.dataset.timeDuration); if (entry) el.textContent = formatDuration(secondsForEntry(entry)); });
+      }
+      function renderTimeLog() {
+        ensureTimeEntries();
+        const root = $('timeLogRoot');
+        const entries = [...state.project.timeEntries].sort((a,b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
+        if (!entries.length) { root.innerHTML = '<table class="time-log-table"><tbody><tr><td class="empty">No time sessions recorded yet.</td></tr></tbody></table>'; updateTimeDisplays(); return; }
+        root.innerHTML = `<table class="time-log-table"><thead><tr><th>Scope / task</th><th>Time in</th><th>Time out</th><th>Duration</th><th>Note</th><th></th></tr></thead><tbody>${entries.map(entry => `<tr data-time-id="${escapeHtml(entry.id)}"><td><strong>${escapeHtml(entry.label || (entry.scope === 'estimate' ? 'Whole estimate' : 'Checklist item'))}</strong><br><span class="page-no">${escapeHtml(entry.scope)}</span></td><td>${escapeHtml(formatDateTime(entry.startedAt))}</td><td>${entry.endedAt ? escapeHtml(formatDateTime(entry.endedAt)) : '<span class="badge review">Active</span>'}</td><td><strong data-time-duration="${escapeHtml(entry.id)}">${escapeHtml(formatDuration(secondsForEntry(entry)))}</strong></td><td><input class="row-input" data-time-note value="${escapeHtml(entry.note)}" placeholder="What did you work on?" /></td><td>${entry.endedAt ? '<button class="btn small danger delete-time" title="Delete session">×</button>' : '<span class="page-no">Running</span>'}</td></tr>`).join('')}</tbody></table>`;
+        root.querySelectorAll('[data-time-note]').forEach(el => el.addEventListener('input', e => { const entry = state.project.timeEntries.find(item => item.id === e.target.closest('[data-time-id]')?.dataset.timeId); if (entry) { entry.note = e.target.value; saveState(); } }));
+        root.querySelectorAll('.delete-time').forEach(el => el.addEventListener('click', () => { const id = el.closest('[data-time-id]').dataset.timeId; state.project.timeEntries = state.project.timeEntries.filter(entry => entry.id !== id); saveState('Time session removed'); renderAll(); showToast('Time session removed'); }));
+        updateTimeDisplays();
+      }
+      function normalizeHeader(value) { return String(value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }
+      function firstRowValue(row, aliases) {
+        const wanted = new Set(aliases);
+        for (const [key, value] of Object.entries(row || {})) if (wanted.has(normalizeHeader(key)) && value !== undefined && value !== null && String(value).trim() !== '') return value;
+        return '';
+      }
+      function parseRate(value) {
+        if (value === null || value === undefined || String(value).trim() === '') return '';
+        if (typeof value === 'number') return Number.isFinite(value) ? value : '';
+        const match = String(value).replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+        if (!match) return '';
+        const parsed = Number(match[0]);
+        return Number.isFinite(parsed) ? parsed : '';
+      }
+      function inferPricingCategory(text) {
+        const raw = String(text || '').toLowerCase();
+        if (/subcontract|trade package|installer|contractor/.test(raw)) return 'Subcontractor';
+        if (/labor|labour|crew|install|wage|hour|hr|man.?day/.test(raw)) return 'Labor';
+        if (/equipment|plant|excavat|crane|scaffold|truck|loader|roller|backhoe/.test(raw)) return 'Equipment';
+        if (/concrete|cement|steel|rebar|reinforc|masonry|brick|block|timber|lumber|pipe|tile|paint|door|window|roof|material/.test(raw)) return 'Material';
+        return 'Other';
+      }
+      function normalizePricingItem(raw, index=0, sourceOverride='') {
+        const row = raw && typeof raw === 'object' ? raw : {};
+        const description = String(firstRowValue(row, ['description','item','itemdescription','name','material','workitem','scope']) || '').trim();
+        const categoryText = String(firstRowValue(row, ['category','trade','discipline','type']) || '').trim();
+        const materialRate = parseRate(firstRowValue(row, ['materialrate','materialcost','materialprice','matrate']));
+        const laborRate = parseRate(firstRowValue(row, ['laborrate','labourrate','laborcost','labourcost','labour','labor']));
+        const equipmentRate = parseRate(firstRowValue(row, ['equipmentrate','equipmentcost','equipmentprice','plantrate','plantcost','equipment']));
+        const totalRate = parseRate(firstRowValue(row, ['totalrate','unitrate','rate','price','cost','unitprice','total','amount']));
+        return {
+          id:String(row.id || uid('price') + '-' + index),
+          code:String(firstRowValue(row, ['code','itemcode','itemno','itemnumber','sku']) || '').trim(),
+          category:categoryText || inferPricingCategory(description),
+          description,
+          unit:String(firstRowValue(row, ['unit','uom','unitofmeasure','measure']) || '').trim(),
+          materialRate,
+          laborRate,
+          equipmentRate,
+          totalRate,
+          currency:String(firstRowValue(row, ['currency','curr','money']) || '').trim().toUpperCase(),
+          source:String(firstRowValue(row, ['source','supplier','vendor','referencesource','reference']) || sourceOverride || '').trim(),
+          sourceDate:String(firstRowValue(row, ['date','pricedate','ratedate','issuedate']) || '').trim(),
+          notes:String(firstRowValue(row, ['notes','note','remarks','comment']) || '').trim()
+        };
+      }
+      function pricingKey(item) { return [item.code,item.description,item.unit,item.source].map(value => String(value || '').trim().toLowerCase()).join('|'); }
+      function mergePricingItems(incoming) {
+        const merged = new Map((pricingState.items || []).map(item => [pricingKey(item), item]));
+        incoming.forEach(item => { if (!item.description) return; const key=pricingKey(item); const old=merged.get(key); merged.set(key, old ? {...old, ...item, id:old.id} : item); });
+        pricingState.items = [...merged.values()];
+      }
+      function savePricingState(message='Pricing library saved') {
+        try { localStorage.setItem(PRICING_STORAGE_KEY, JSON.stringify(pricingState)); } catch (err) { /* private mode or blocked storage */ }
+        if ($('pricingStatus')) $('pricingStatus').textContent = message;
+      }
+      function loadPricingState() {
+        try {
+          const raw = localStorage.getItem(PRICING_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const rows = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.items) ? parsed.items : []);
+            pricingState.items = rows.map(normalizePricingItem).filter(item => item.description);
+            pricingState.sourceFile = String(parsed.sourceFile || '');
+            pricingState.importedAt = String(parsed.importedAt || '');
+          }
+        } catch (err) { pricingState.items = []; }
+      }
+      const PRICING_CATEGORIES = ['Material','Labor','Equipment','Subcontractor','Other'];
+      function pricingOptions(selected) { return PRICING_CATEGORIES.map(category => '<option value="' + escapeHtml(category) + '" ' + (category === selected ? 'selected' : '') + '>' + escapeHtml(category) + '</option>').join(''); }
+      function renderPricingStats() {
+        const items = pricingState.items || [];
+        const categories = new Set(items.map(item => item.category).filter(Boolean));
+        const currencies = new Set(items.map(item => item.currency).filter(Boolean));
+        $('pricingCountStat').textContent = items.length;
+        $('pricingSourceStat').textContent = pricingState.sourceFile || '—';
+        $('pricingCategoryStat').textContent = categories.size;
+        $('pricingCurrencyStat').textContent = currencies.size ? [...currencies].join(', ') : '—';
+      }
+      function filteredPricing() {
+        const query = $('pricingSearch').value.toLowerCase().trim();
+        const category = $('pricingCategoryFilter').value;
+        return (pricingState.items || []).filter(item => {
+          const haystack = [item.code,item.category,item.description,item.unit,item.currency,item.source,item.sourceDate,item.notes].join(' ').toLowerCase();
+          return (!query || haystack.includes(query)) && (!category || item.category === category);
+        });
+      }
+      function renderPricing() {
+        const categoryFilter = $('pricingCategoryFilter');
+        const currentCategory = categoryFilter.value;
+        const categories = [...new Set((pricingState.items || []).map(item => item.category).filter(Boolean))].sort();
+        categoryFilter.innerHTML = '<option value="">All categories</option>' + categories.map(category => '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + '</option>').join('');
+        if (categories.includes(currentCategory)) categoryFilter.value = currentCategory;
+        const rows = filteredPricing();
+        $('pricingVisibleCount').textContent = rows.length + ' visible';
+        $('pricingBody').innerHTML = rows.length ? rows.map(item => `<tr data-pricing-id="${escapeHtml(item.id)}">
+          <td><select class="row-input" data-pricing-field="category">${pricingOptions(item.category)}</select></td>
+          <td><input class="row-input" data-pricing-field="description" value="${escapeHtml(item.description)}" /></td>
+          <td><input class="row-input" data-pricing-field="unit" value="${escapeHtml(item.unit)}" placeholder="m², kg, ea" /></td>
+          <td><input class="row-input" type="number" step="any" data-pricing-field="materialRate" value="${escapeHtml(item.materialRate)}" /></td>
+          <td><input class="row-input" type="number" step="any" data-pricing-field="laborRate" value="${escapeHtml(item.laborRate)}" /></td>
+          <td><input class="row-input" type="number" step="any" data-pricing-field="equipmentRate" value="${escapeHtml(item.equipmentRate)}" /></td>
+          <td><input class="row-input" type="number" step="any" data-pricing-field="totalRate" value="${escapeHtml(item.totalRate)}" /></td>
+          <td><input class="row-input" data-pricing-field="currency" value="${escapeHtml(item.currency)}" placeholder="PHP" /></td>
+          <td><input class="row-input" data-pricing-field="source" value="${escapeHtml(item.source)}" /></td>
+          <td><input class="row-input" data-pricing-field="sourceDate" value="${escapeHtml(item.sourceDate)}" placeholder="YYYY-MM-DD" /></td>
+          <td><textarea class="row-input notes-input" data-pricing-field="notes" placeholder="Supplier, validity, assumptions…">${escapeHtml(item.notes)}</textarea></td>
+          <td><button class="btn small danger delete-pricing" title="Delete pricing row">×</button></td>
+        </tr>`).join('') : '<tr><td colspan="12" class="empty">No pricing records match the current filter.</td></tr>';
+        $('pricingBody').querySelectorAll('[data-pricing-field]').forEach(el => el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', handlePricingEdit));
+        $('pricingBody').querySelectorAll('.delete-pricing').forEach(el => el.addEventListener('click', () => { const id=el.closest('[data-pricing-id]').dataset.pricingId; pricingState.items=pricingState.items.filter(item=>item.id!==id); savePricingState('Pricing row removed'); renderPricing(); showToast('Pricing row removed'); }));
+        renderPricingStats();
+      }
+      function handlePricingEdit(e) {
+        const item = pricingState.items.find(row => row.id === e.target.closest('[data-pricing-id]')?.dataset.pricingId);
+        if (!item) return;
+        const field = e.target.dataset.pricingField;
+        item[field] = ['materialRate','laborRate','equipmentRate','totalRate'].includes(field) ? parseRate(e.target.value) : e.target.value;
+        savePricingState(); renderPricingStats();
+      }
+      function addPricingRow() {
+        pricingState.items.push({id:uid('price'),code:'',category:'Other',description:'New pricing item',unit:'',materialRate:'',laborRate:'',equipmentRate:'',totalRate:'',currency:'',source:'Manual entry',sourceDate:'',notes:''});
+        savePricingState('Pricing row added'); renderPricing(); showToast('Pricing row added');
+      }
+      function clearPricing() {
+        if (!confirm('Clear the entire pricing library? This cannot be undone from the app.')) return;
+        pricingState.items=[]; pricingState.sourceFile=''; pricingState.importedAt=''; savePricingState('Pricing library cleared'); renderPricing(); showToast('Pricing library cleared');
+      }
+      async function extractPdfLines(file) {
+        if (!window.pdfjsLib) throw new Error('PDF text extractor did not load. Use Excel/CSV/TXT or load the app with internet access.');
+        const pdf = await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer()), disableWorker:true}).promise;
+        const lines=[];
+        for (let pageNumber=1; pageNumber<=pdf.numPages; pageNumber++) {
+          const content=await pdf.getPage(pageNumber).then(page=>page.getTextContent());
+          const groups=new Map();
+          content.items.forEach(item=>{const value=cleanText(item.str || '');if(!value)return;const y=Math.round((Number(item.transform?.[5])||0)/2)*2;const group=groups.get(y)||[];group.push({x:Number(item.transform?.[4])||0,value});groups.set(y,group);});
+          [...groups.entries()].sort((a,b)=>b[0]-a[0]).forEach(([,items])=>lines.push(items.sort((a,b)=>a.x-b.x).map(item=>item.value).join(' ')));
+          lines.push('');
+        }
+        return lines.join('\n');
+      }
+      function parsePricingText(text, source='') {
+        const rows=[];
+        const lines=String(text || '').split(/\r?\n/).map(cleanText).filter(Boolean);
+        const ratePattern=/(?:₱|PHP|USD|AUD|CAD|EUR|£|€|\$)?\s*-?\d[\d,]*(?:\.\d{1,4})?/gi;
+        lines.forEach(line=>{
+          const matches=[...line.matchAll(ratePattern)];
+          if(!matches.length)return;
+          const match=matches[matches.length-1];
+          const before=cleanText(line.slice(0,match.index));
+          if(before.length<3 || /^(item|description|unit|uom|rate|price|amount|total|subtotal|page)\b/i.test(before))return;
+          const unitMatch=before.match(/\b(m2|m²|sqm|m3|m³|cum|lm|l\.m\.|kg|t|ton|bag|ea|each|pcs?|set|lot|hr|hour|day|week)\b/i);
+          const unit=unitMatch ? unitMatch[1] : '';
+          const description=cleanText(unit ? before.replace(unitMatch[0],'') : before);
+          if(description.length<3 || /^(total|subtotal|page)\b/i.test(description))return;
+          const token=match[0];
+          const currencyMatch=token.match(/₱|PHP|USD|AUD|CAD|EUR|£|€/i);
+          rows.push(normalizePricingItem({description,unit,totalRate:parseRate(token),currency:currencyMatch ? currencyMatch[0].toUpperCase() : '',category:inferPricingCategory(description),source,notes:'Imported from text/PDF line; verify against the original source.'},rows.length,source));
+        });
+        return rows.filter(item=>item.description);
+      }
+      async function readPricingFile(file) {
+        const ext=file.name.split('.').pop().toLowerCase();
+        if(['xlsx','xls','csv'].includes(ext)) {
+          if(!window.XLSX)throw new Error('Excel parser did not load. Use the app with internet access.');
+          const workbook=XLSX.read(await file.arrayBuffer(),{type:'array'});
+          const firstSheet=workbook.Sheets[workbook.SheetNames[0]];
+          return XLSX.utils.sheet_to_json(firstSheet,{defval:''}).map((row,index)=>normalizePricingItem(row,index,file.name)).filter(item=>item.description);
+        }
+        if(ext==='json') {
+          const parsed=JSON.parse(await file.text());
+          const rows=Array.isArray(parsed)?parsed:(parsed.items||parsed.pricing||parsed.data||parsed.rows||[]);
+          return Array.isArray(rows)?rows.map((row,index)=>normalizePricingItem(row,index,file.name)).filter(item=>item.description):[];
+        }
+        const text=ext==='pdf' ? await extractPdfLines(file) : await file.text();
+        return parsePricingText(text,file.name);
+      }
+      async function importPricingFile() {
+        const file=$('pricingFileInput').files[0];
+        if(!file){showToast('Choose a pricing Excel, CSV, PDF, TXT, or JSON file first');return;}
+        $('pricingStatus').textContent='Reading '+file.name+' locally…';
+        try {
+          const imported=await readPricingFile(file);
+          if(!imported.length)throw new Error('No pricing rows with a usable item description were detected.');
+          const sourceSaved=await saveInputFileToProjectFolder(file,'pricing source');
+          mergePricingItems(imported); pricingState.sourceFile=file.name; pricingState.importedAt=new Date().toISOString(); savePricingState('Imported '+imported.length+' pricing record(s) from '+file.name+(sourceSaved ? ' · copied into project folder' : '')); renderPricing(); showToast(sourceSaved ? 'Pricing imported and copied to project folder' : 'Pricing library imported');
+        } catch(err) { console.error(err); $('pricingStatus').textContent='Could not import pricing file: '+err.message; showToast('Pricing import failed'); }
+      }
+      function pricingWorkbookRows() { return [['Code','Category','Item / Description','Unit','Material Rate','Labor Rate','Equipment Rate','Total Rate','Currency','Source','Source Date','Notes'],...(pricingState.items||[]).map(item=>[item.code||'',item.category||'',item.description||'',item.unit||'',item.materialRate,item.laborRate,item.equipmentRate,item.totalRate,item.currency||'',item.source||'',item.sourceDate||'',item.notes||''])]; }
+      function csvCell(value) { return '"' + String(value ?? '').replace(/"/g,'""') + '"'; }
+      async function exportPricingCsv() { const rows=pricingWorkbookRows();const csv=rows.map(row=>row.map(csvCell).join(',')).join('\n');const saved=await download(fileStem()+'_Pricing_Library.csv',csv,'text/csv');showToast(saved?'Pricing CSV saved to project folder':'Pricing CSV downloaded'); }
+      async function exportPricingExcel() { if(!window.XLSX){showToast('Excel exporter is unavailable. Export CSV instead.');return;}const workbook=XLSX.utils.book_new();appendWorkbookSheet(workbook,'Pricing Library',pricingWorkbookRows(),[14,18,42,12,16,14,18,14,12,30,16,54]);try{const data=XLSX.write(workbook,{bookType:'xlsx',type:'array'});const saved=await download(fileStem()+'_Pricing_Library.xlsx',data,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');showToast(saved?'Pricing Excel saved to project folder':'Pricing Excel downloaded');}catch(err){console.error(err);showToast('Could not create the pricing workbook');} }
+      function normalizeSheet(sheet, index=0) {
+        const s = {...sheet};
+        s.id = s.id || uid('sheet');
+        s.page = Number(s.page || s.page_number || index + 1);
+        s.sheet = String(s.sheet || s.sheet_number || '').trim().toUpperCase();
+        const suppliedTitle = String(s.title || s.title_guess || '').trim();
+        const evidenceTitle = titleMatch((suppliedTitle + ' ' + String(s.evidence || '')).trim());
+        const looksFlattened = suppliedTitle.length > 72 || (extractSheetNumbers(suppliedTitle).length > 1) || suppliedTitle.split(/\s+/).length > 13;
+        const canInferFromEvidence = !suppliedTitle && String(s.evidence || '').length <= 260 && (!Array.isArray(s.candidates) || s.candidates.length <= 1);
+        s.title = (looksFlattened && evidenceTitle ? evidenceTitle.title : suppliedTitle) || (canInferFromEvidence && evidenceTitle ? evidenceTitle.title : '');
+        s.discipline = String(s.discipline || inferDiscipline(s.sheet, s.title));
+        s.label = String(s.label || makeLabel(s.sheet, s.title, s.discipline));
+        s.confidence = ['high','medium','low'].includes(s.confidence) ? s.confidence : confidenceFor(s);
+        s.evidence = cleanText(s.evidence || '');
+        s.status = ['ready','review','exclude'].includes(s.status) ? s.status : (s.confidence === 'high' ? 'ready' : 'review');
+        s.notes = String(s.notes || '');
+        s.candidates = Array.isArray(s.candidates) ? s.candidates : [];
+        s.summary = String(s.summary || s.evidence || '').trim();
+        s.revision = String(s.revision || '').trim();
+        s.scale = String(s.scale || '').trim();
+        s.drawingDate = String(s.drawingDate || s.drawing_date || '').trim();
+        s.sourceFile = String(s.sourceFile || s.source_file || '').trim();
+        s.extractionStatus = String(s.extractionStatus || s.extraction_status || (s.evidence ? 'Embedded text read' : 'Manual review')).trim();
+        s.textItemCount = Number(s.textItemCount || s.text_item_count || 0);
+        s.lineCount = Number(s.lineCount || s.line_count || 0);
+        s.titleBlockText = cleanText(s.titleBlockText || s.title_block_text || '').slice(0, 1200);
+        s.textSample = cleanText(s.textSample || s.text_sample || '').slice(0, 5000);
+        return s;
+      }
+      function extractSheetNumbers(text) {
+        const raw = String(text || '').toUpperCase();
+        // The slash-aware pass catches common title-block forms such as 95309/SD/A00.01.
+        const matches = raw.match(/\b[A-Z]{1,3}(?:[-/ ]?\d{1,3})(?:[.\-]\d{1,3}){0,2}[A-Z]?\b/g) || [];
+        const normalized = matches.map(x => x.replace(/[ ]+/g, '').replace(/\//g, '-')).filter(x => /[A-Z]/.test(x) && /\d/.test(x));
+        const unique = [];
+        normalized.forEach(item => { if (!unique.includes(item)) unique.push(item); });
+        return unique.filter(item => !/^AS\d/.test(item) && !/^ISO\d/.test(item) && !/^NCC\d/.test(item));
+      }
+      function sheetCandidateScore(candidate, position=0) {
+        const value=String(candidate || '').toUpperCase();
+        const prefix=value.match(/^([A-Z]{1,3})/)?.[1] || '';
+        const digits=(value.match(/\d/g) || []).length;
+        const recognized=/^(A|AR|G|GN|S|ST|C|CV|E|EL|M|ME|P|PL|H|F|FP|FS|L)$/.test(prefix);
+        const suspicious=/^(AND|TO|OF|LOT|BED|COL|HR|GR|PB|EP|PC|FW|RJ|TOW|RL|LB|N)$/.test(prefix);
+        let score=Math.max(0,4-position);
+        if (/[.\-]/.test(value)) score+=12;
+        if (recognized) score+=6;
+        if (digits >= 3) score+=3;
+        if (/^[A-Z]{1,3}-?\d{2,4}(?:[.\-]\d{1,3})?[A-Z]?$/.test(value)) score+=10;
+        if (suspicious) score-=14;
+        return score;
+      }
+      function chooseSheetNumber(titleCandidates, allCandidates, candidateHints=[]) {
+        const pool=[...titleCandidates,...allCandidates.filter(value=>!titleCandidates.includes(value))];
+        const ranked=pool.map((value,index)=>{const base=sheetCandidateScore(value,index);const y=Math.max(0,...candidateHints.filter(hint=>hint.value===value).map(hint=>hint.yRatio||0));const spatial=base>=9?(y>=.9?30:y>=.82?15:0):0;return{value,score:base+spatial};}).sort((a,b)=>b.score-a.score || pool.indexOf(a.value)-pool.indexOf(b.value));
+        return {sheet:ranked[0]?.score >= 9 ? ranked[0].value : '', plausible:ranked.filter(item=>item.score >= 9).map(item=>item.value)};
+      }
+      function titleMatch(text) {
+        const raw = cleanText(text).toLowerCase();
+        let best = null;
+        TITLE_RULES.forEach(rule => {
+          let score = 0; let matched = '';
+          rule.words.forEach(word => {
+            if (raw.includes(word)) { const weight = word.length > 8 ? 3 : 2; score += weight; if (!matched || word.length > matched.length) matched = word; }
+          });
+          if (score && (!best || score > best.score)) best = {...rule, score, matched};
+        });
+        return best;
+      }
+      function inferDiscipline(sheet, title='') {
+        const normalized = String(sheet || '').toUpperCase().replace(/[-_.]/g, ' ');
+        const byPrefix = PREFIX_DISCIPLINES.find(x => x.prefix.test(normalized));
+        if (byPrefix) return byPrefix.discipline;
+        const match = titleMatch(title);
+        return match ? match.discipline : 'Unclassified';
+      }
+      function confidenceFor(s) {
+        if (s.confidence) return s.confidence;
+        if (s.sheet && s.title && s.evidence && s.candidates?.length <= 1) return 'high';
+        if (s.sheet || s.title) return 'medium';
+        return 'low';
+      }
+      function makeLabel(sheet, title, discipline) {
+        const id = sheet || 'Unnumbered';
+        const niceTitle = title || (discipline && discipline !== 'Unclassified' ? discipline + ' drawing' : 'Drawing sheet');
+        return id + ' — ' + niceTitle;
+      }
+      function evidenceSnippet(text, sheet, matched) {
+        const raw = cleanText(text);
+        const terms = [sheet, matched].filter(Boolean);
+        let pos = -1;
+        for (const term of terms) { const found = raw.toLowerCase().indexOf(String(term).toLowerCase()); if (found >= 0) { pos = found; break; } }
+        if (pos < 0) return raw.slice(0, 190);
+        return (pos > 45 ? '…' : '') + raw.slice(Math.max(0, pos - 45), pos + 150) + (raw.length > pos + 150 ? '…' : '');
+      }
+      function positionalPageText(content, viewport) {
+        const items = (content.items || []).map(item => {
+          const text = cleanText(item.str || '');
+          if (!text) return null;
+          let transform = item.transform || [1,0,0,1,0,0];
+          if (window.pdfjsLib?.Util?.transform) transform = window.pdfjsLib.Util.transform(viewport.transform, transform);
+          const height = Math.max(5, Math.hypot(Number(transform[2]) || 0, Number(transform[3]) || 0), Number(item.height) || 0);
+          return {text, x:Number(transform[4]) || 0, y:Number(transform[5]) || 0, height};
+        }).filter(Boolean).sort((a,b) => a.y - b.y || a.x - b.x);
+        const lines = [];
+        items.forEach(item => {
+          let line = null;
+          for (let i = lines.length - 1; i >= Math.max(0, lines.length - 8); i--) {
+            const candidate = lines[i];
+            const tolerance = Math.max(2.5, Math.min(8, Math.max(item.height, candidate.height) * .48));
+            if (Math.abs(candidate.y - item.y) <= tolerance) { line = candidate; break; }
+          }
+          if (!line) { line={y:item.y, x:item.x, height:item.height, items:[]}; lines.push(line); }
+          line.items.push(item);
+          line.x = Math.min(line.x, item.x);
+          line.y = (line.y * (line.items.length - 1) + item.y) / line.items.length;
+          line.height = Math.max(line.height, item.height);
+        });
+        lines.sort((a,b) => a.y - b.y || a.x - b.x);
+        const normalizedLines = lines.map(line => {
+          line.items.sort((a,b) => a.x - b.x);
+          return {text:cleanText(line.items.map(item => item.text).join(' ')).replace(/\s+([,.;:])/g,'$1'), x:line.x, y:line.y};
+        }).filter(line => line.text);
+        const width = Math.max(1, Number(viewport.width) || 1);
+        const height = Math.max(1, Number(viewport.height) || 1);
+        const titleBlockLines = normalizedLines.filter(line => (line.y / height >= .62 && line.x / width >= .40) || line.y / height >= .82);
+        const sheetCandidateHints=normalizedLines.flatMap(line=>extractSheetNumbers(line.text).map(value=>({value,xRatio:line.x/width,yRatio:line.y/height})));
+        return {
+          allText:cleanText(normalizedLines.map(line => line.text).join(' ')),
+          titleBlockText:cleanText(titleBlockLines.map(line => line.text).join(' ')),
+          itemCount:items.length,
+          lineCount:normalizedLines.length,
+          sheetCandidateHints
+        };
+      }
+      function detectedMetadata(text) {
+        const raw = cleanText(text);
+        const revision = raw.match(/\bREV(?:ISION)?\b\s*[:#.-]?\s*([A-Z0-9]{1,8})\b/i)?.[1] || '';
+        const scale = raw.match(/\bSCALE(?:S)?\b\s*[:.-]?\s*((?:1\s*[:/]\s*\d{1,5})|NTS|AS\s+NOTED)\b/i)?.[1]?.replace(/\s+/g,'') || '';
+        const drawingDate = raw.match(/\b(?:DATE|ISSUED)\b\s*[:.-]?\s*(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}[./-]\d{1,2}[./-]\d{1,2})\b/i)?.[1] || '';
+        return {revision, scale, drawingDate};
+      }
+      function summarizePage(text, title, discipline) {
+        const raw = cleanText(text).toLowerCase();
+        const topics = PAGE_TOPICS.filter(topic => topic.words.some(word => raw.includes(word))).map(topic => topic.label).slice(0, 4);
+        const subject = title || (discipline && discipline !== 'Unclassified' ? discipline + ' drawing' : 'Drawing page');
+        if (!raw) return 'No readable embedded text was detected; identify this page manually.';
+        if (!topics.length) return subject + ' identified from the embedded PDF text; verify the title block and drawing content.';
+        const topicText = topics.length === 1 ? topics[0] : topics.slice(0,-1).join(', ') + ', and ' + topics.at(-1);
+        return subject + ' covering ' + topicText + '.';
+      }
+      function detectPageFromLayout(layout, pageNumber) {
+        const raw = cleanText(layout.allText);
+        const titleBlockText = cleanText(layout.titleBlockText);
+        const titleCandidates = extractSheetNumbers(titleBlockText);
+        const allCandidates = extractSheetNumbers(raw);
+        const choice = chooseSheetNumber(titleCandidates, allCandidates, layout.sheetCandidateHints || []);
+        const candidates = choice.plausible;
+        const titleBlockMatch = titleMatch(titleBlockText);
+        const match = titleBlockMatch || titleMatch(raw);
+        const sheet = choice.sheet;
+        const title = match ? match.title : '';
+        const prefixDiscipline = inferDiscipline(sheet, '');
+        const discipline = match?.discipline === 'General' ? 'General' : (prefixDiscipline !== 'Unclassified' && prefixDiscipline !== 'Architectural' ? prefixDiscipline : (match?.discipline || prefixDiscipline));
+        const metadata = detectedMetadata(titleBlockText || raw);
+        const reviewReasons = [];
+        if (!raw) reviewReasons.push('No readable embedded text detected.');
+        if (!sheet) reviewReasons.push('No sheet number detected.');
+        if (!title) reviewReasons.push('No drawing-title keyword detected.');
+        if (!titleBlockText && raw) reviewReasons.push('Title-block region was not identified; result uses full-page text.');
+        if (candidates.length > 1) reviewReasons.push(candidates.length + ' sheet-number candidates detected.');
+        const strongTitleBlock = Boolean(titleBlockText && sheet && titleBlockMatch);
+        const confidence = strongTitleBlock ? 'high' : (raw && (sheet || title) ? 'medium' : 'low');
+        const evidenceSource = titleBlockText || raw;
+        const s = normalizeSheet({
+          page:pageNumber,
+          sheet,
+          title,
+          discipline,
+          summary:summarizePage(raw, title, discipline),
+          revision:metadata.revision,
+          scale:metadata.scale,
+          drawingDate:metadata.drawingDate,
+          evidence:evidenceSnippet(evidenceSource, sheet, match?.matched),
+          candidates,
+          confidence,
+          status:confidence === 'high' ? 'ready' : 'review',
+          notes:reviewReasons.join(' '),
+          extractionStatus:raw ? 'Embedded text read' : 'No readable embedded text',
+          textItemCount:layout.itemCount || 0,
+          lineCount:layout.lineCount || 0,
+          titleBlockText,
+          textSample:raw
+        }, pageNumber - 1);
+        return s;
+      }
+      function detectPage(text, pageNumber) {
+        const raw = cleanText(text);
+        return detectPageFromLayout({allText:raw,titleBlockText:'',itemCount:raw ? raw.split(/\s+/).length : 0,lineCount:raw ? 1 : 0}, pageNumber);
+      }
+      async function extractPdf(file) {
+        if (!window.pdfjsLib) throw new Error('PDF text extractor did not load. Use a .txt/.json file or add sheets manually.');
+        const buffer = await file.arrayBuffer();
+        const pdf = await window.pdfjsLib.getDocument({data:new Uint8Array(buffer), disableWorker:true}).promise;
+        setViewerPdf(pdf,file.name);
+        const sheets = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          $('importStatus').textContent = 'Reading embedded text · PDF page ' + i + ' of ' + pdf.numPages + '…';
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({scale:1});
+          const content = await page.getTextContent();
+          sheets.push(detectPageFromLayout(positionalPageText(content, viewport), i));
+        }
+        return {pages:pdf.numPages, sheets};
+      }
+      function parseText(text) {
+        const lines = String(text || '').split(/\r?\n/).map(cleanText).filter(Boolean);
+        const allText = lines.join(' ');
+        const pageMarkers = lines.reduce((arr, line, idx) => {
+          if (/^(page\s*)?\d+\s*(of\s*\d+)?$/i.test(line) || /^---+\s*page\s*\d+/i.test(line)) arr.push(idx);
+          return arr;
+        }, []);
+        if (pageMarkers.length >= 2) {
+          const pages = [];
+          pageMarkers.forEach((start, i) => { const end = pageMarkers[i+1] ?? lines.length; pages.push(detectPage(lines.slice(start, end).join(' '), i+1)); });
+          return {pages:pages.length, sheets:pages};
+        }
+        const nums = extractSheetNumbers(allText);
+        const title = titleMatch(allText);
+        const sheets = nums.map((sheet, i) => normalizeSheet({page:i+1, sheet, title:'', discipline:inferDiscipline(sheet, ''), evidence:evidenceSnippet(allText, sheet, ''), candidates:nums, confidence:'medium', status:'review', notes:'Imported from flattened text; verify page mapping and title.'}, i));
+        if (!sheets.length) sheets.push(normalizeSheet({page:1, sheet:'', title:title?.title || '', discipline:title?.discipline || 'Unclassified', evidence:allText.slice(0, 190), confidence:'low', status:'review', notes:'No sheet number detected in text.'}, 0));
+        return {pages:Math.max(sheets.length, 1), sheets};
+      }
+      function parseJson(text) {
+        const parsed = JSON.parse(text);
+        const root = Array.isArray(parsed) ? parsed[0] : parsed;
+        const project = root.project || {};
+        const table = root.table_of_contents || root.sheets || root.document?.table_of_contents || [];
+        const checklist = root.checklist || project.checklist;
+        const content = root.content || project.content;
+        const roadmap = root.roadmap || project.roadmap;
+        const timeEntries = root.timeEntries || project.timeEntries;
+        const sheets = table.map((s, i) => normalizeSheet({...s, page:s.page || s.page_number || i+1}, i));
+        return {
+          pages:Number(root.page_count || root.document?.page_count || project.pages || sheets.length || 0),
+          sheets, checklist, content, roadmap, timeEntries,
+          name:root.document?.title || project.name || '',
+          location:project.location || root.location || '',
+          revision:project.revision || root.revision || '',
+          estimator:project.estimator || root.estimator || '',
+          sourceFile:project.sourceFile || '',
+          folderName:project.folderName || '',
+          folderCreatedAt:project.folderCreatedAt || '',
+          files:project.files
+        };
+      }
+      async function analyzeFile(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        $('importStatus').textContent = 'Reading ' + file.name + ' locally…';
+        let result;
+        let sourceSaved=false;
+        if (ext === 'json') {
+          viewerState.pdf=null;viewerState.fileName='';viewerState.renderTask=null;
+          $('pdfViewerCanvas').classList.add('hidden');$('viewerEmpty').classList.remove('hidden');$('viewerPageCount').textContent='0';setViewerStatus('Select the original source PDF to use the built-in viewer.');
+          result = parseJson(await file.text());
+          const priorFolderName=state.project.folderName;
+          ['name','location','revision','estimator'].forEach(key => { if (result[key] !== undefined) state.project[key] = result[key]; });
+          state.project.folderName=result.folderName || '';
+          state.project.folderCreatedAt=result.folderCreatedAt || '';
+          state.project.files=Array.isArray(result.files) ? result.files : [];
+          if (priorFolderName !== state.project.folderName) { fileSystemState.parentHandle=null; fileSystemState.projectHandle=null; }
+        } else {
+          sourceSaved=await saveInputFileToProjectFolder(file, ext === 'pdf' ? 'plan PDF' : 'plan text extraction');
+          if (ext === 'pdf') result = await extractPdf(file);
+          else result = parseText(await file.text());
+        }
+        state.project.pages = result.pages || result.sheets.length;
+        state.project.sourceFile = ext === 'json' && result.sourceFile ? result.sourceFile : file.name;
+        state.project.sheets = result.sheets.map((sheet,index) => normalizeSheet({...sheet,sourceFile:sheet.sourceFile || state.project.sourceFile},index));
+        if (ext !== 'json' && result.name && !state.project.name) state.project.name = result.name;
+        if (result.checklist && Array.isArray(result.checklist)) {
+          const existing = makeChecklistState();
+          state.project.checklist = existing.map(item => { const found=result.checklist.find(x => x.item === item.title || x.title === item.title); return found ? {...item, done:found.status === 'complete' || found.done === true, note:found.notes || found.note || ''} : item; });
+        }
+        if (result.content) state.project.content = {...makeContentState(), ...result.content};
+        if (result.roadmap && Array.isArray(result.roadmap)) state.project.roadmap = result.roadmap;
+        if (result.timeEntries && Array.isArray(result.timeEntries)) state.project.timeEntries = result.timeEntries;
+        ensureTimeEntries();
+        refreshRoadmap();
+        saveState('Imported and saved locally');
+        syncProjectFields(); renderAll();
+        $('importStatus').textContent = 'Loaded ' + file.name + ' · ' + state.project.pages + ' page(s) · ' + state.project.sheets.length + ' sheet entr' + (state.project.sheets.length === 1 ? 'y' : 'ies') + '.' + (sourceSaved ? ' Source copied into ' + state.project.folderName + '.' : '');
+        if (ext === 'pdf' && viewerState.requested) await goToViewerPage(viewerState.page);
+      }
+      function makeDemo() {
+        const demo = [
+          ['A00.01','Cover / Drawing Index','General','Project cover, drawing index, notes, and issue information.'],
+          ['A00.04','General Notes & Legends','General','General notes, symbols, abbreviations, and standards.'],
+          ['A00.11','Yield / Information Data','Architectural','Unit yield and project information data.'],
+          ['A00.12','Private Open Spaces Diagram','Architectural','Private open spaces and area diagram.'],
+          ['A01.01','Survey / Existing Conditions Plan','Civil / Site','Survey and existing conditions plan.'],
+          ['A01.02','Site Plan','Civil / Site','Site layout, boundaries, setbacks, and access.'],
+          ['A01.03','Demolition Plan','Architectural','Existing work and demolition plan.'],
+          ['A01.11','Fire Egress / Life Safety Plan','Fire / Life Safety','Site circulation and fire egress plan.'],
+          ['A02.01','Floor Plan — Ground Level','Architectural','Ground level floor plan, rooms, dimensions, and fixtures.'],
+          ['A02.02','Floor Plan — Typical Upper Level','Architectural','Typical upper-floor plan and room layout.'],
+          ['A02.03','Roof Plan','Architectural','Roof layout, drainage, and roof-level information.'],
+          ['A02.04','Elevations','Architectural','External elevations and façade information.'],
+          ['A02.05','Sections','Architectural','Building sections, heights, and levels.'],
+          ['A02.06','Architectural Details','Architectural','Construction and junction details.'],
+          ['A02.07','Doors / Windows / Hardware Schedules','Architectural','Openings, hardware, and schedule information.'],
+          ['A02.08','Room Finishes / Fitout Plan','Architectural','Finishes, fitout, and room-specific requirements.'],
+          ['A02.11','Structural Framing Plan','Structural','Structural framing and member information.'],
+          ['A02.12','Structural Details','Structural','Structural details and connection information.'],
+          ['A04.01','Landscape / External Works Plan','Landscape / External','Landscape and external works.'],
+          ['A04.02','Drainage / Stormwater Plan','Civil / Site','Stormwater and drainage information.'],
+          ['A05.01','Specifications / Technical Notes','General','Technical notes, standards, and specification references.']
+        ];
+        state.project.name = state.project.name || '4 Baynes Street';
+        state.project.location = state.project.location || 'Demo plan set';
+        state.project.revision = state.project.revision || 'SD · 30/03/2026';
+        state.project.pages = 19;
+        state.project.sourceFile = 'Demo set';
+        state.project.sheets = demo.map((d, i) => normalizeSheet({page:i+1, sheet:d[0], title:d[1], discipline:d[2], evidence:d[3], confidence:'high', status:'ready'}, i));
+        refreshRoadmap();
+        saveState('Demo set loaded'); syncProjectFields(); renderAll(); $('importStatus').textContent = 'Loaded the 19-page demo set with 21 labeled sheet entries.'; showToast('Demo plan set loaded');
+      }
+      function renderStats() {
+        $('pageStat').textContent = state.project.pages || state.project.sheets.length || 0;
+        $('sheetStat').textContent = state.project.sheets.length;
+        $('reviewStat').textContent = state.project.sheets.filter(s => s.status === 'review' || s.confidence !== 'high').length;
+        const checks = state.project.checklist || [];
+        const done = checks.filter(x => x.done).length;
+        $('doneStat').textContent = checks.length ? Math.round(done / checks.length * 100) + '%' : '0%';
+      }
+      function renderDisciplineFilter() {
+        const select = $('disciplineFilter'); const current = select.value;
+        const values = [...new Set(state.project.sheets.map(s => s.discipline).filter(Boolean))].sort();
+        select.innerHTML = '<option value="">All disciplines</option>' + values.map(x => '<option value="' + escapeHtml(x) + '">' + escapeHtml(x) + '</option>').join('');
+        if (values.includes(current)) select.value = current;
+      }
+      function filteredSheets() {
+        const q = $('tocSearch').value.toLowerCase().trim(); const discipline = $('disciplineFilter').value; const status = $('statusFilter').value;
+        return state.project.sheets.filter(s => {
+          const hay = [s.sheet,s.label,s.title,s.discipline,s.summary,s.revision,s.scale,s.evidence,s.notes].join(' ').toLowerCase();
+          return (!q || hay.includes(q)) && (!discipline || s.discipline === discipline) && (!status || s.status === status);
+        });
+      }
+      function renderToc() {
+        const rows = filteredSheets();
+        $('visibleCount').textContent = rows.length + ' visible';
+        if (!rows.length) { $('tocBody').innerHTML = '<tr><td colspan="12" class="empty">No sheet entries match the current filters.</td></tr>'; return; }
+        $('tocBody').innerHTML = rows.map(s => `
+          <tr data-id="${escapeHtml(s.id)}">
+            <td><span class="sheet-id">${escapeHtml(s.page)}</span><br><span class="page-no">physical page</span></td>
+            <td><input class="row-input sheet-input" data-field="sheet" value="${escapeHtml(s.sheet)}" placeholder="A01.01" /></td>
+            <td><input class="row-input label-input" data-field="label" value="${escapeHtml(s.label)}" /><div class="page-no" style="margin-top:4px">Title: ${escapeHtml(s.title || '—')}</div></td>
+            <td><select class="row-input" data-field="discipline">${disciplineOptions(s.discipline)}</select></td>
+            <td><div class="evidence">${escapeHtml(s.summary || 'No page summary available.')}</div><div class="page-no" style="margin-top:4px">${escapeHtml(s.extractionStatus || '')} · ${escapeHtml(s.textItemCount || 0)} text items</div></td>
+            <td><div><strong>${escapeHtml(s.revision || '—')}</strong></div><div class="page-no">Scale: ${escapeHtml(s.scale || '—')}${s.drawingDate ? ' · ' + escapeHtml(s.drawingDate) : ''}</div></td>
+            <td><span class="confidence ${escapeHtml(s.confidence)}">${escapeHtml(s.confidence)}</span></td>
+            <td><div class="evidence">${escapeHtml(s.evidence || 'No evidence captured.')}</div>${s.candidates?.length > 1 ? '<div class="page-no" style="margin-top:4px">Candidates: ' + escapeHtml(s.candidates.join(', ')) + '</div>' : ''}</td>
+            <td><select class="row-input" data-field="status"><option value="ready" ${s.status==='ready'?'selected':''}>Ready</option><option value="review" ${s.status==='review'?'selected':''}>Review</option><option value="exclude" ${s.status==='exclude'?'selected':''}>Exclude</option></select></td>
+            <td><textarea class="row-input notes-input" data-field="notes" placeholder="Review note…">${escapeHtml(s.notes)}</textarea></td>
+            <td><button class="btn small soft open-viewer-page" data-page="${escapeHtml(s.page)}">Open page</button></td>
+            <td><button class="btn small danger delete-sheet" title="Remove sheet">×</button></td>
+          </tr>`).join('');
+        $('tocBody').querySelectorAll('[data-field]').forEach(el => el.addEventListener('change', handleSheetEdit));
+        $('tocBody').querySelectorAll('.open-viewer-page').forEach(el => el.addEventListener('click',() => goToViewerPage(el.dataset.page).catch(err=>{console.error(err);setViewerStatus('Could not render the selected PDF page.');})));
+        $('tocBody').querySelectorAll('.delete-sheet').forEach(el => el.addEventListener('click', () => { const id=el.closest('tr').dataset.id; state.project.sheets=state.project.sheets.filter(s=>s.id!==id); saveState('Sheet removed'); renderAll(); showToast('Sheet removed'); }));
+      }
+      function disciplineOptions(selected) {
+        const options = ['General','Architectural','Structural','Civil / Site','Landscape / External','Mechanical','Electrical','Plumbing / Hydraulic','Fire / Life Safety','Unclassified'];
+        return options.map(x => '<option value="'+escapeHtml(x)+'" '+(x===selected?'selected':'')+'>'+escapeHtml(x)+'</option>').join('');
+      }
+      function handleSheetEdit(e) {
+        const tr=e.target.closest('tr'); const s=state.project.sheets.find(x=>x.id===tr.dataset.id); if (!s) return;
+        const field=e.target.dataset.field; s[field]=e.target.value;
+        if (field === 'sheet' || field === 'discipline') { s.label = field === 'sheet' && s.label.startsWith((s.sheet || '').replace(e.target.value,'')) ? makeLabel(s.sheet,s.title,s.discipline) : s.label; }
+        if (field === 'label' && !s.label.trim()) s.label=makeLabel(s.sheet,s.title,s.discipline);
+        refreshRoadmap(); saveState('Sheet edit saved'); renderStats(); renderToc(); renderDisciplineFilter(); renderRoadmap(); updateViewerMetadata();
+      }
+      function renderChecklist() {
+        const root=$('checklistRoot'); const sections=[];
+        CHECKLIST.forEach(([section,description]) => {
+          const items=state.project.checklist.filter(x=>x.section===section); const complete=items.filter(x=>x.done).length;
+          sections.push(`<section class="check-section"><div class="check-section-head"><div><h3>${escapeHtml(section)}</h3><span class="page-no">${escapeHtml(description)}</span></div><span class="check-count">${complete}/${items.length}</span></div><div class="check-items">${items.map(item=>{const latest=latestTimeEntry('checklist',item.id);const active=activeTimeEntry();const itemActive=active&&active.scope==='checklist'&&active.refId===item.id;return `<div class="check-item"><input type="checkbox" data-check-id="${escapeHtml(item.id)}" ${item.done?'checked':''} aria-label="${escapeHtml(item.title)}" /><div><div class="check-title">${escapeHtml(item.title)}</div><div class="check-prompt">${escapeHtml(item.prompt)}</div></div><textarea class="check-note" data-note-id="${escapeHtml(item.id)}" placeholder="Evidence, sheet reference, or note…">${escapeHtml(item.note)}</textarea><div class="check-time"><div class="page-no">Spent: <strong data-live-time-id="${escapeHtml(item.id)}">${escapeHtml(formatDuration(secondsForScope('checklist',item.id)))}</strong></div><div class="page-no">In: ${escapeHtml(latest?.startedAt?formatDateTime(latest.startedAt):'—')}</div><div class="page-no">Out: ${escapeHtml(latest?(latest.endedAt?formatDateTime(latest.endedAt):'Active'):'—')}</div><div class="button-row"><button class="btn soft" data-time-action="start" data-time-scope="checklist" data-time-ref="${escapeHtml(item.id)}" ${active?'disabled':''}>Start</button><button class="btn" data-time-action="stop" data-time-scope="checklist" data-time-ref="${escapeHtml(item.id)}" ${itemActive?'':'disabled'}>Stop</button></div></div></div>`;}).join('')}</div></section>`);
+        });
+        root.innerHTML=sections.join('');
+        root.querySelectorAll('[data-check-id]').forEach(el=>el.addEventListener('change',e=>{const item=state.project.checklist.find(x=>x.id===e.target.dataset.checkId);if(item){item.done=e.target.checked;saveState('Checklist saved');renderChecklist();renderStats();}}));
+        root.querySelectorAll('[data-note-id]').forEach(el=>el.addEventListener('input',e=>{const item=state.project.checklist.find(x=>x.id===e.target.dataset.noteId);if(item){item.note=e.target.value;saveState();}}));
+        root.querySelectorAll('[data-time-action]').forEach(el=>el.addEventListener('click',()=>{const action=el.dataset.timeAction;const scope=el.dataset.timeScope;const refId=el.dataset.timeRef;if(action==='start')startTimer(scope,refId);else stopTimer(scope,refId);}));
+        const done=state.project.checklist.filter(x=>x.done).length,total=state.project.checklist.length,pct=total?Math.round(done/total*100):0;
+        $('checklistText').textContent=done+' of '+total+' complete'; $('checkProgress').style.width=pct+'%'; $('checkPercent').textContent=pct+'%';
+      }
+      function renderContent() {
+        if (!Object.keys(state.project.content).length) state.project.content=makeContentState();
+        $('contentRoot').innerHTML=CONTENT_FIELDS.map(([key,title,description])=>`<div class="content-card"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p><textarea data-content-key="${escapeHtml(key)}" placeholder="Write here…">${escapeHtml(state.project.content[key] || '')}</textarea></div>`).join('');
+        $('contentRoot').querySelectorAll('[data-content-key]').forEach(el=>el.addEventListener('input',e=>{state.project.content[e.target.dataset.contentKey]=e.target.value;saveState();}));
+      }
+      function renderRoadmap() {
+        if (!Array.isArray(state.project.roadmap) || !state.project.roadmap.length) refreshRoadmap();
+        const root = $('roadmapRoot');
+        root.innerHTML = state.project.roadmap.map(item => `<article class="roadmap-item" data-roadmap-id="${escapeHtml(item.key)}">
+          <div class="roadmap-number">${escapeHtml(item.step)}</div>
+          <div>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p><strong>${escapeHtml(item.phase)}</strong> · ${escapeHtml(item.purpose)}</p>
+            <div class="roadmap-output"><strong>Suggested output:</strong> ${escapeHtml(item.outputs)}</div>
+            <div class="roadmap-fields">
+              <label class="field">Status<select class="row-input" data-roadmap-field="status">${ROADMAP_STATUSES.map(status => `<option value="${escapeHtml(status)}" ${item.status === status ? 'selected' : ''}>${escapeHtml(status)}</option>`).join('')}</select></label>
+              <label class="field">Sheet / evidence reference<input class="row-input" data-roadmap-field="reference" value="${escapeHtml(item.reference)}" placeholder="e.g., A01.02, specification section, supplier quote" /></label>
+            </div>
+            <label class="field" style="margin-top:10px">Notes<textarea class="row-input" data-roadmap-field="notes" placeholder="Project-specific note, dependency, owner, due date, or unresolved question…">${escapeHtml(item.notes)}</textarea></label>
+          </div>
+        </article>`).join('');
+        root.querySelectorAll('[data-roadmap-field]').forEach(el => el.addEventListener(el.tagName === 'TEXTAREA' || el.type === 'text' ? 'input' : 'change', handleRoadmapEdit));
+      }
+      function handleRoadmapEdit(e) {
+        const item = state.project.roadmap.find(x => x.key === e.target.closest('[data-roadmap-id]')?.dataset.roadmapId);
+        if (!item) return;
+        item[e.target.dataset.roadmapField] = e.target.value;
+        saveState('Roadmap saved');
+      }
+      function renderAll() { renderStats(); renderDisciplineFilter(); renderToc(); renderScopeGate(); renderChecklist(); renderContent(); renderRoadmap(); renderTimeLog(); renderPricing(); updateViewerMetadata(); }
+      function makeTocText() {
+        const name=state.project.name || 'Untitled project'; const lines=['IO Wisp — Plan Table of Contents',name,state.project.revision ? 'Set / revision: '+state.project.revision : '', '', 'Page\tSheet\tLabel\tDiscipline\tStatus\tEvidence'];
+        state.project.sheets.forEach(s=>lines.push([s.page,s.sheet || '—',s.label,s.discipline,s.status,s.evidence].join('\t'))); return lines.filter(Boolean).join('\n');
+      }
+      function makeChecklistText() { const lines=['IO Wisp — Estimator Checklist',state.project.name || 'Untitled project',''];CHECKLIST.forEach(([section])=>{lines.push(section);state.project.checklist.filter(x=>x.section===section).forEach(x=>lines.push((x.done?'[x] ':'[ ] ')+x.title+(x.note?' — '+x.note:'')));lines.push('');});return lines.join('\n'); }
+      function makeContentText() { const lines=['IO Wisp — Estimate Brief',state.project.name || 'Untitled project',''];CONTENT_FIELDS.forEach(([key,title])=>{lines.push(title.toUpperCase());lines.push(state.project.content[key] || '[Not completed]');lines.push('');});return lines.join('\n'); }
+      function makeRoadmapText() {
+        const lines=['IO Wisp — Estimating Roadmap',state.project.name || 'Untitled project','','Step\tPhase\tMilestone\tPurpose\tSuggested output\tStatus\tReference\tNotes'];
+        (state.project.roadmap || []).forEach(item => lines.push([item.step,item.phase,item.title,item.purpose,item.outputs,item.status,item.reference,item.notes].join('\t')));
+        return lines.join('\n');
+      }
+      function triggerBrowserDownload(name, blob) { const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500); }
+      async function download(name, content, type='text/plain', kind='output') { const blob=content instanceof Blob ? content : new Blob([content],{type}); const saved=await writeBlobToProjectFolder(name,blob,kind,true); if (!saved) triggerBrowserDownload(name,blob); return saved; }
+      function fileStem() { return (state.project.name || 'io-wisp-project').trim().replace(/[^a-z0-9]+/gi,'_').replace(/^_+|_+$/g,'') || 'io-wisp-project'; }
+      async function exportJson() { const saved=await download(fileStem()+'.json',JSON.stringify({io_assistant:'IO Wisp Lite',app_version:APP_VERSION,api_used:false,project:state.project,document:{title:state.project.name,page_count:state.project.pages},table_of_contents:state.project.sheets,checklist:state.project.checklist,roadmap:state.project.roadmap,content:state.project.content},null,2),'application/json');showToast(saved?'Project file saved to project folder':'Project file downloaded'); }
+      async function exportCsv() { const header='PDF Page,Sheet,Drawing Title,Label,Discipline,Page Summary,Revision,Scale,Drawing Date,Confidence,Status,Source File,Evidence,Notes';const csv=[header,...state.project.sheets.map(s=>[s.page,s.sheet,s.title,s.label,s.discipline,s.summary,s.revision,s.scale,s.drawingDate,s.confidence,s.status,s.sourceFile||state.project.sourceFile,s.evidence,s.notes].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(','))].join('\n');const saved=await download((state.project.name||'io-wisp-toc').replace(/[^a-z0-9]+/gi,'_')+'_TOC.csv',csv,'text/csv');showToast(saved?'TOC CSV saved to project folder':'TOC CSV downloaded'); }
+      function reportTable(headers, rows) {
+        return `<table><thead><tr>${headers.map(header=>'<th>'+escapeHtml(header)+'</th>').join('')}</tr></thead><tbody>${rows.length ? rows.map(row=>'<tr>'+row.map(value=>'<td>'+escapeHtml(value ?? '')+'</td>').join('')+'</tr>').join('') : '<tr><td colspan="'+headers.length+'">No records.</td></tr>'}</tbody></table>`;
+      }
+      function buildReportHtml() {
+        const project=state.project; const checks=project.checklist||[]; const done=checks.filter(item=>item.done).length; const reviewSheets=(project.sheets||[]).filter(sheet=>sheet.status==='review'||sheet.confidence!=='high'); const generatedAt=new Date().toLocaleString('en-PH');
+        const tocRows=(project.sheets||[]).map(sheet=>[sheet.page,sheet.sheet,sheet.title,sheet.discipline,sheet.summary,sheet.revision,sheet.scale,sheet.confidence,sheet.status,sheet.evidence,sheet.notes]);
+        const checklistRows=checks.map(item=>[item.section,item.title,item.done?'Complete':'Open',item.prompt,item.note]);
+        const roadmapRows=(project.roadmap||[]).map(item=>[item.step,item.phase,item.title,item.status,item.reference,item.notes]);
+        const timeRows=[...(project.timeEntries||[])].sort((a,b)=>new Date(a.startedAt).getTime()-new Date(b.startedAt).getTime()).map(entry=>[entry.label,formatDateTime(entry.startedAt),entry.endedAt?formatDateTime(entry.endedAt):'Active',formatDuration(secondsForEntry(entry)),entry.note]);
+        const pricingRows=(pricingState.items||[]).slice(0,200).map(item=>[item.category,item.description,item.unit,item.materialRate,item.laborRate,item.equipmentRate,item.totalRate,item.currency,item.source,item.sourceDate,item.notes]);
+        return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${escapeHtml(project.name||'IO Wisp Estimate Report')}</title><style>
+          @page{size:A4;margin:16mm}body{font-family:Arial,Helvetica,sans-serif;color:#162238;line-height:1.4;font-size:10pt}h1{font-size:24pt;margin:0;color:#10243f}h2{font-size:15pt;color:#1769aa;border-bottom:2px solid #2e9cca;padding-bottom:4px;margin-top:25px}h3{font-size:11pt;margin:0 0 4px;color:#10243f}.kicker{color:#2e9cca;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:8pt}.meta{display:grid;grid-template-columns:160px 1fr;gap:3px 12px;margin:15px 0 20px}.meta strong{color:#66738a}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.summary div{border:1px solid #dbe3ef;padding:8px;border-radius:6px}.summary b{display:block;font-size:15pt;color:#10243f}table{border-collapse:collapse;width:100%;margin-top:8px;font-size:8pt;page-break-inside:auto}th{background:#eaf2f8;color:#27445f;text-align:left}th,td{border:1px solid #cfd9e4;padding:5px;vertical-align:top}tr{page-break-inside:avoid}.note{color:#66738a}.section-intro{color:#66738a;margin:0 0 8px}.footer{margin-top:25px;color:#66738a;font-size:8pt;border-top:1px solid #dbe3ef;padding-top:8px}@media print{h2{page-break-after:avoid}}
+        </style></head><body><div class="kicker">IO Wisp · Input & Output</div><h1>Estimate Preparation Report</h1><div class="meta"><strong>Project</strong><span>${escapeHtml(project.name||'Untitled project')}</span><strong>Location / client</strong><span>${escapeHtml(project.location||'')}</span><strong>Set / revision</strong><span>${escapeHtml(project.revision||'')}</span><strong>Estimator</strong><span>${escapeHtml(project.estimator||'')}</span><strong>Source file</strong><span>${escapeHtml(project.sourceFile||'')}</span><strong>Generated</strong><span>${escapeHtml(generatedAt)}</span></div><div class="summary"><div><b>${escapeHtml(project.pages||0)}</b>physical pages</div><div><b>${escapeHtml((project.sheets||[]).length)}</b>sheet entries</div><div><b>${escapeHtml(reviewSheets.length)}</b>review flags</div><div><b>${escapeHtml(checks.length?Math.round(done/checks.length*100)+'%':'0%')}</b>checklist complete</div></div>
+        <h2>Table of contents</h2><p class="section-intro">Review the title-block extraction, page summary, evidence, and status before treating this register as complete.</p>${reportTable(['PDF Page','Sheet','Drawing Title','Discipline','Page Summary','Revision','Scale','Confidence','Status','Evidence','Notes'],tocRows)}
+        <h2>Review flags</h2>${reportTable(['Page','Sheet','Label','Discipline','Confidence','Status','Reason / Evidence','Notes'],reviewSheets.map(sheet=>[sheet.page,sheet.sheet,sheet.label,sheet.discipline,sheet.confidence,sheet.status,sheet.notes||sheet.evidence||'Manual verification required.',sheet.notes]))}
+        <h2>Estimator checklist</h2>${reportTable(['Section','Item','Status','Prompt','Evidence / Note'],checklistRows)}
+        <h2>Estimating roadmap</h2>${reportTable(['Step','Phase','Milestone','Status','Sheet / Evidence Reference','Notes'],roadmapRows)}
+        <h2>Time log</h2><p class="section-intro">Whole estimate time: ${escapeHtml(formatDuration(secondsForScope('estimate')))} · Checklist time: ${escapeHtml(formatDuration(secondsForScope('checklist')))} · All recorded time: ${escapeHtml(formatDuration(secondsForScope('estimate')+secondsForScope('checklist')))}</p>${reportTable(['Scope / Task','Time in','Time out','Duration','Note'],timeRows)}
+        <h2>Estimate content</h2>${reportTable(['Category','Prompt','Notes'],CONTENT_FIELDS.map(([key,title,description])=>[title,description,project.content?.[key]||'']))}
+        <h2>Pricing library reference</h2><p class="section-intro">${escapeHtml(pricingState.items.length)} pricing records are stored in the reusable library${pricingState.sourceFile?' · latest source: '+pricingState.sourceFile:''}. The first 200 records are included below; the complete library is available through the Excel export.</p>${reportTable(['Category','Item / Description','Unit','Material','Labor','Equipment','Total','Currency','Source','Date','Notes'],pricingRows)}
+        <div class="footer">IO Wisp Lite report. Confirm drawings, specifications, quantities, rates, assumptions, and engineering decisions before issuing a price.</div></body></html>`;
+      }
+      async function downloadReport() { const saved=await download(fileStem()+'_Estimate_Report.html',buildReportHtml(),'text/html;charset=utf-8'); showToast(saved?'Estimate report saved to project folder':'Estimate report downloaded'); }
+      function printReport() { const popup=window.open('','_blank'); if(!popup){showToast('Allow pop-ups to print the report');return;} popup.document.open();popup.document.write(buildReportHtml());popup.document.close();popup.focus();setTimeout(()=>popup.print(),450); }
+      function appendWorkbookSheet(workbook, name, rows, widths, autoFilter=true) {
+        const sheet = XLSX.utils.aoa_to_sheet(rows);
+        if (widths) sheet['!cols'] = widths.map(w => ({wch:w}));
+        if (autoFilter && rows.length > 1 && rows[0].length) {
+          sheet['!autofilter'] = {ref:'A1:' + XLSX.utils.encode_col(rows[0].length - 1) + rows.length};
+        }
+        XLSX.utils.book_append_sheet(workbook, sheet, name);
+        return sheet;
+      }
+      function relativePdfPageTarget(sourceFile, pageNumber) {
+        const name=String(sourceFile || '').trim();
+        const page=Math.max(1, Number(pageNumber) || 1);
+        if (!/\.pdf$/i.test(name)) return '';
+        const safeName=encodeURIComponent(name).replace(/%2F/gi,'/');
+        return './' + safeName + '#page=' + page;
+      }
+      function setWorkbookHyperlink(sheet, rowIndex, columnIndex, target, label, tooltip) {
+        if (!target) return;
+        const address=XLSX.utils.encode_cell({r:rowIndex,c:columnIndex});
+        const cell=sheet[address] || {t:'s',v:label};
+        cell.t='s'; cell.v=label; cell.l={Target:target,Tooltip:tooltip || label};
+        sheet[address]=cell;
+      }
+      function exportExcel() {
+        if (!window.XLSX) { showToast('Excel exporter is unavailable. Export CSV instead.'); return; }
+        const project = state.project;
+        const checks = project.checklist || [];
+        const done = checks.filter(item => item.done).length;
+        const reviewSheets = (project.sheets || []).filter(sheet => sheet.status === 'review' || sheet.confidence !== 'high');
+        const estimateSeconds = secondsForScope('estimate');
+        const checklistSeconds = secondsForScope('checklist');
+        const timeEntries = project.timeEntries || [];
+        const workbook = XLSX.utils.book_new();
+        workbook.Props={Title:(project.name || 'IO Wisp') + ' — Estimating Preparation',Subject:'Plan register, page summaries, scope, checklist, and estimating roadmap',Author:project.estimator || 'IO Wisp Lite',Comments:'Generated by IO Wisp Lite ' + APP_VERSION};
+        appendWorkbookSheet(workbook, 'Project Summary', [
+          ['IO Wisp Lite — Estimating Preparation Workbook'],
+          ['Application version', APP_VERSION],
+          ['Project', project.name || 'Untitled project'],
+          ['Location / client', project.location || ''],
+          ['Set / revision', project.revision || ''],
+          ['Estimator', project.estimator || ''],
+          ['Source file', project.sourceFile || ''],
+          ['Physical pages', project.pages || 0],
+          ['Sheet entries', (project.sheets || []).length],
+          ['Sheets needing review', reviewSheets.length],
+          ['Checklist completion', checks.length ? Math.round(done / checks.length * 100) + '%' : '0%'],
+          ['Whole estimate time', formatDuration(estimateSeconds)],
+          ['Checklist time', formatDuration(checklistSeconds)],
+          ['All recorded time', formatDuration(estimateSeconds + checklistSeconds)],
+          ['Time sessions', timeEntries.length],
+          ['Pricing library records', (pricingState.items || []).length],
+          [],
+          ['Workbook contents'],
+          ['Table of Contents', 'Detected and editable sheet register with evidence and review status.'],
+          ['Scope Gate', 'Original client brief, inclusions, exclusions, clarifications, and strict include/reject/hold decisions.'],
+          ['Estimator Checklist', 'Control, drawing review, scope, takeoff, pricing, risk, and final-issue checks.'],
+          ['Estimating Roadmap', 'Preliminary milestones generated from standard estimating practice and detected disciplines.'],
+          ['Estimate Content', 'Editable scope, basis, assumptions, exclusions, RFIs, risks, rates, and change-log prompts.'],
+          ['Review Flags', 'Sheets that need manual verification before using the register for estimating.'],
+          ['Time Log', 'Time in, time out, duration, and notes for estimate and checklist work sessions.'],
+          ['Pricing Library', 'Reusable material, labor, equipment, subcontractor, and other pricing records.'],
+          [],
+          ['PDF-link requirement', 'Keep this workbook in the same folder as the source PDF. Direct links use the physical PDF page number; Open in IO Wisp links return to this installed app location.'],
+          ['Important note', 'This workbook is a transparent preparation aid. It does not perform exact scaled takeoffs, final pricing, structural design, or code approval.']
+        ], [30, 96], false);
+        const tocSheet=appendWorkbookSheet(workbook, 'Table of Contents', [
+          ['PDF Page','Sheet','Drawing Title','Clean Label','Discipline','Page Summary','Revision','Scale','Confidence','Status','Source File','Open PDF Page','Open in IO Wisp','Evidence','Notes'],
+          ...(project.sheets || []).map(sheet => [sheet.page, sheet.sheet || '', sheet.title || '', sheet.label || '', sheet.discipline || '', sheet.summary || '', sheet.revision || '', sheet.scale || '', sheet.confidence || '', sheet.status || '', sheet.sourceFile || project.sourceFile || '', relativePdfPageTarget(sheet.sourceFile || project.sourceFile, sheet.page) ? 'Open PDF page' : '', viewerApplicationTarget(sheet.page) ? 'Open in IO Wisp' : '', sheet.evidence || '', sheet.notes || ''])
+        ], [12,16,32,38,22,62,12,12,14,16,32,18,20,52,44]);
+        (project.sheets || []).forEach((drawing,index) => {
+          setWorkbookHyperlink(tocSheet,index+1,11,relativePdfPageTarget(drawing.sourceFile || project.sourceFile,drawing.page),'Open PDF page','Open PDF page ' + drawing.page + (drawing.sheet ? ' · ' + drawing.sheet : ''));
+          setWorkbookHyperlink(tocSheet,index+1,12,viewerApplicationTarget(drawing.page),'Open in IO Wisp','Open physical PDF page ' + drawing.page + ' in IO Wisp');
+        });
+        ensureScopeBrief();appendWorkbookSheet(workbook,'Scope Gate',[['Strict Scope Brief'],['Original request',project.scopeBrief.raw||''],['Included scope',project.scopeBrief.included||''],['Rejected / excluded scope',project.scopeBrief.excluded||''],['Clarifications',project.scopeBrief.clarifications||''],['Reject items not explicitly included',project.scopeBrief.strict?'Yes':'No'],[],['Work Package','Decision','Reason'],...(project.scopeBrief.gate||[]).map(item=>[item.label,item.decision,item.reason])],[34,28,64],false);
+        appendWorkbookSheet(workbook, 'Estimator Checklist', [
+          ['Section','Item','Prompt','Status','Evidence / Note'],
+          ...checks.map(item => [item.section || '', item.title || '', item.prompt || '', item.done ? 'Complete' : 'Open', item.note || ''])
+        ], [24, 34, 74, 16, 48]);
+        appendWorkbookSheet(workbook, 'Estimating Roadmap', [
+          ['Step','Phase','Milestone','Purpose','Suggested Output','Status','Sheet / Evidence Reference','Notes'],
+          ...(project.roadmap || []).map(item => [item.step || '', item.phase || '', item.title || '', item.purpose || '', item.outputs || '', item.status || '', item.reference || '', item.notes || ''])
+        ], [10, 22, 34, 68, 50, 18, 38, 44]);
+        appendWorkbookSheet(workbook, 'Estimate Content', [
+          ['Category','Prompt','Notes'],
+          ...CONTENT_FIELDS.map(([key, title, description]) => [title, description, project.content?.[key] || ''])
+        ], [34, 72, 78]);
+        const reviewSheet=appendWorkbookSheet(workbook, 'Review Flags', [
+          ['PDF Page','Sheet','Drawing Title','Discipline','Page Summary','Confidence','Status','Source File','Open PDF Page','Open in IO Wisp','Review Reason / Evidence','Notes'],
+          ...reviewSheets.map(sheet => [sheet.page, sheet.sheet || '', sheet.title || '', sheet.discipline || '', sheet.summary || '', sheet.confidence || '', sheet.status || '', sheet.sourceFile || project.sourceFile || '', relativePdfPageTarget(sheet.sourceFile || project.sourceFile,sheet.page) ? 'Open PDF page' : '', viewerApplicationTarget(sheet.page) ? 'Open in IO Wisp' : '', sheet.notes || sheet.evidence || 'Manual verification required.', sheet.notes || ''])
+        ], [12,16,32,22,62,14,16,32,18,20,58,44]);
+        reviewSheets.forEach((drawing,index) => {
+          setWorkbookHyperlink(reviewSheet,index+1,8,relativePdfPageTarget(drawing.sourceFile || project.sourceFile,drawing.page),'Open PDF page','Open PDF page ' + drawing.page + (drawing.sheet ? ' · ' + drawing.sheet : ''));
+          setWorkbookHyperlink(reviewSheet,index+1,9,viewerApplicationTarget(drawing.page),'Open in IO Wisp','Open physical PDF page ' + drawing.page + ' in IO Wisp');
+        });
+        appendWorkbookSheet(workbook, 'Time Log', [
+          ['Scope / Task','Time In','Time Out','Duration','Seconds','Note'],
+          ...timeEntries.map(entry => [entry.label || (entry.scope === 'estimate' ? 'Whole estimate' : 'Checklist item'), formatDateTime(entry.startedAt), entry.endedAt ? formatDateTime(entry.endedAt) : 'Active', formatDuration(secondsForEntry(entry)), secondsForEntry(entry), entry.note || ''])
+        ], [34, 30, 30, 14, 12, 54]);
+        appendWorkbookSheet(workbook, 'Pricing Library', pricingWorkbookRows(), [14, 18, 42, 12, 16, 14, 18, 14, 12, 30, 16, 54]);
+        try {
+          const data = XLSX.write(workbook, {bookType:'xlsx', type:'array'});
+          const filename = fileStem() + '_IO_Wisp_Estimating_Prep.xlsx';
+          download(filename, data, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet').then(saved => showToast(saved ? 'Excel workbook saved to project folder' : 'Excel workbook downloaded'));
+        } catch (err) {
+          console.error(err);
+          showToast('Could not create the Excel workbook');
+        }
+      }
+      async function copy(text, message) { try { await navigator.clipboard.writeText(text); showToast(message); } catch { download('io-wisp-copy.txt',text); showToast('Clipboard unavailable; text downloaded'); } }
+      function showToast(message) { const t=$('toast');t.textContent=message;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2200); }
+      function resetChecklist() { if (!confirm('Reset every checklist item? Notes will also be cleared.')) return; state.project.checklist=makeChecklistState();saveState('Checklist reset');renderAll();showToast('Checklist reset'); }
+      function resetRoadmap() { if (!confirm('Reset every roadmap milestone and clear its notes?')) return; state.project.roadmap=makeRoadmapState();saveState('Roadmap reset');renderRoadmap();showToast('Roadmap reset'); }
+      function clearProject() { if (!confirm('Clear the current project, sheets, scope, notes, checklist, roadmap, time log, viewer, and folder link?')) return; fileSystemState.projectHandle=null;viewerState.pdf=null;viewerState.fileName='';viewerState.page=1;viewerState.renderTask=null;$('pdfViewerCanvas').classList.add('hidden');$('viewerEmpty').classList.remove('hidden');$('viewerPageCount').textContent='0';state.project={name:'',location:'',revision:'',estimator:'',pages:0,sourceFile:'',sheets:[],checklist:makeChecklistState(),content:makeContentState(),roadmap:[],timeEntries:[],scopeBrief:makeScopeBriefState(),folderName:'',folderCreatedAt:'',files:[]};refreshRoadmap();saveState('Project cleared');syncProjectFields();syncScopeFields();renderAll();updateViewerMetadata();setViewerStatus('Load a source PDF or analyze one on the Plan Index tab.');updateFolderUi();$('importStatus').textContent='No plan set loaded yet.';showToast('Project cleared'); }
+      function addBlankSheet() { const page=(Math.max(0,...state.project.sheets.map(s=>Number(s.page)||0))+1);state.project.sheets.push(normalizeSheet({page,sheet:'',title:'',discipline:'Unclassified',label:'Unnumbered — Drawing sheet',evidence:'Added manually.',confidence:'low',status:'review',notes:'Manual review required.'},state.project.sheets.length));state.project.pages=Math.max(state.project.pages,page);refreshRoadmap();saveState('Blank sheet added');renderAll();showToast('Blank sheet added'); }
+      function switchTab(tab) { document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));['index','viewer','scope','checklist','content','roadmap','time','pricing'].forEach(x=>$(x+'Tab').classList.toggle('hidden',x!==tab));if(tab==='viewer'){updateViewerMetadata();if(viewerState.pdf)requestAnimationFrame(()=>renderViewerPage(viewerState.page).catch(err=>{console.error(err);setViewerStatus('Could not render the selected PDF page.');}));} }
+      function wireEvents() {
+        bindProjectFields();
+        $('chooseParentFolderBtn').addEventListener('click',chooseParentFolder); $('createProjectFolderBtn').addEventListener('click',createProjectFolder); $('saveLabeledPdfBtn').addEventListener('click',saveLabeledPdf);
+        document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
+        $('loadViewerPdfBtn').addEventListener('click',async()=>{const file=$('viewerFileInput').files[0];try{await loadViewerPdfFile(file);showToast('Source PDF loaded in viewer');}catch(err){console.error(err);setViewerStatus(err.message || 'Could not load the source PDF.');showToast('PDF viewer load failed');}});
+        $('viewerPageInput').addEventListener('change',()=>goToViewerPage($('viewerPageInput').value).catch(err=>{console.error(err);setViewerStatus('Could not render the requested PDF page.');}));
+        $('viewerPrevBtn').addEventListener('click',()=>goToViewerPage(viewerState.page-1).catch(err=>{console.error(err);setViewerStatus('Could not render the previous page.');}));
+        $('viewerNextBtn').addEventListener('click',()=>goToViewerPage(viewerState.page+1).catch(err=>{console.error(err);setViewerStatus('Could not render the next page.');}));
+        $('viewerZoomOutBtn').addEventListener('click',()=>{viewerState.scale=Math.max(.2,viewerState.scale-.15);renderViewerPage().catch(err=>{console.error(err);setViewerStatus('Could not change viewer zoom.');});});
+        $('viewerZoomInBtn').addEventListener('click',()=>{viewerState.scale=Math.min(3,viewerState.scale+.15);renderViewerPage().catch(err=>{console.error(err);setViewerStatus('Could not change viewer zoom.');});});
+        $('viewerFitBtn').addEventListener('click',()=>fitViewerWidth().catch(err=>{console.error(err);setViewerStatus('Could not fit the PDF page.');}));
+        $('applyScopeBtn').addEventListener('click',applyScopeBrief);$('loadScopeFileBtn').addEventListener('click',()=>loadScopeBriefFile().catch(err=>{console.error(err);showToast('Could not load scope brief');}));$('copyScopeBtn').addEventListener('click',()=>copy(makeScopeText(),'Scope gate copied'));
+        $('fileInput').addEventListener('change',()=>{const file=$('fileInput').files[0];if(file)$('importStatus').textContent='Selected '+file.name+'. Press Analyze selected file.';});
+        $('analyzeBtn').addEventListener('click',async()=>{const file=$('fileInput').files[0];if(!file){showToast('Choose a PDF, TXT, or JSON file first');return;}try{await analyzeFile(file);showToast('Plan set analyzed locally');}catch(err){console.error(err);$('importStatus').textContent='Could not analyze file: '+err.message;showToast('Analysis failed; see import status');}});
+        $('projectFileInput').addEventListener('change',()=>{const file=$('projectFileInput').files[0];if(file)$('importStatus').textContent='Selected saved project '+file.name+'. Press Open saved project.';});
+        $('openProjectBtn').addEventListener('click',async()=>{const file=$('projectFileInput').files[0];if(!file){showToast('Choose a saved IO Wisp JSON project first');return;}try{await analyzeFile(file);$('importStatus').textContent='Opened saved project '+file.name+'.';showToast('Project opened');}catch(err){console.error(err);$('importStatus').textContent='Could not open project: '+err.message;showToast('Project open failed');}});
+        $('loadDemoBtn').addEventListener('click',makeDemo); $('clearBtn').addEventListener('click',clearProject); $('addSheetBtn').addEventListener('click',addBlankSheet);
+        $('exportJsonBtn').addEventListener('click',exportJson); $('exportCsvBtn').addEventListener('click',exportCsv); $('exportXlsxBtn').addEventListener('click',exportExcel); $('printBtn').addEventListener('click',()=>window.print()); $('copyTocBtn').addEventListener('click',()=>copy(makeTocText(),'TOC copied'));
+        $('copyChecklistBtn').addEventListener('click',()=>copy(makeChecklistText(),'Checklist copied')); $('copyContentBtn').addEventListener('click',()=>copy(makeContentText(),'Estimate brief copied')); $('resetChecklistBtn').addEventListener('click',resetChecklist);
+        $('copyRoadmapBtn').addEventListener('click',()=>copy(makeRoadmapText(),'Roadmap copied')); $('resetRoadmapBtn').addEventListener('click',resetRoadmap);
+        $('startEstimateTimerBtn').addEventListener('click',()=>startTimer('estimate','estimate')); $('stopEstimateTimerBtn').addEventListener('click',()=>stopTimer('estimate','estimate')); $('downloadReportBtn').addEventListener('click',downloadReport); $('printReportBtn').addEventListener('click',printReport);
+        $('importPricingBtn').addEventListener('click',importPricingFile); $('addPricingBtn').addEventListener('click',addPricingRow); $('clearPricingBtn').addEventListener('click',clearPricing); $('exportPricingCsvBtn').addEventListener('click',exportPricingCsv); $('exportPricingXlsxBtn').addEventListener('click',exportPricingExcel);
+        ['tocSearch','disciplineFilter','statusFilter'].forEach(id=>$(id).addEventListener('input',renderToc));
+        $('pricingSearch').addEventListener('input',renderPricing); $('pricingCategoryFilter').addEventListener('change',renderPricing);
+      }
+      loadState();loadPricingState();if(!state.project.checklist.length)state.project.checklist=makeChecklistState();if(!Object.keys(state.project.content).length)state.project.content=makeContentState();ensureScopeBrief();buildScopeGate();refreshRoadmap();ensureTimeEntries();normalizeProjectFiles();syncProjectFields();syncScopeFields();wireEvents();renderAll();updateViewerMetadata();updateFolderUi();if(viewerState.requested)switchTab('viewer');restoreFileSystemHandles();setInterval(updateTimeDisplays,1000);
+    })();
+  </script>
+</body>
+</html>

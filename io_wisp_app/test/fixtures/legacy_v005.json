@@ -1,0 +1,30 @@
+{
+  "io_assistant": "IO Wisp Lite",
+  "app_version": "V0.0.5",
+  "api_used": false,
+  "project": {
+    "id": "project-synthetic001",
+    "createdAt": "2026-08-01T01:02:03.000Z",
+    "updatedAt": "2026-08-02T01:02:03.000Z",
+    "name": "Synthetic Workshop",
+    "location": "Example Client",
+    "revision": "Rev A",
+    "estimator": "Test Estimator",
+    "pages": 1,
+    "sourceFile": "synthetic-plan.pdf",
+    "sheets": [{"id":"sheet-synthetic1","page":1,"sheet":"S-01","title":"Synthetic plan","label":"S-01 - Synthetic plan","discipline":"Structural","confidence":"low","evidence":"Synthetic fixture only","status":"review","notes":"","candidates":[],"summary":"Synthetic fixture only","revision":"A","scale":"","drawingDate":"","sourceFile":"synthetic-plan.pdf","extractionStatus":"text","textItemCount":1,"lineCount":1,"titleBlockText":"","textSample":""}],
+    "checklist": [{"id":"check-synthetic1","section":"Control","description":"Synthetic checklist","title":"Review example","prompt":"Verify","done":false,"note":""}],
+    "content": {"scope":"Synthetic scope","basis":"","assumptions":"","exclusions":"","rfis":"","risks":"","rates":"","changes":""},
+    "roadmap": [],
+    "timeEntries": [{"id":"time-synthetic1","scope":"estimate","refId":"","label":"Synthetic session","startedAt":"2026-08-01T01:02:03.000Z","endedAt":"2026-08-01T01:03:03.000Z","durationSeconds":60,"note":""}],
+    "scopeBrief": {"raw":"Synthetic scope only","lastParsedRaw":"","included":"","excluded":"","clarifications":"","strict":true,"sourceFile":"","gate":[]},
+    "folderName": "Synthetic Workshop_Example Client - 2026-08-01",
+    "folderCreatedAt": "2026-08-01T01:02:03.000Z",
+    "files": [{"name":"synthetic-plan.pdf","kind":"plan PDF","savedAt":"2026-08-01T01:02:03.000Z"}]
+  },
+  "document": {"title":"Synthetic Workshop","page_count":1},
+  "table_of_contents": [{"id":"sheet-synthetic1","page":1,"sheet":"S-01","title":"Synthetic plan","label":"S-01 - Synthetic plan","discipline":"Structural","confidence":"low","evidence":"Synthetic fixture only","status":"review","notes":"","candidates":[],"summary":"Synthetic fixture only","revision":"A","scale":"","drawingDate":"","sourceFile":"synthetic-plan.pdf","extractionStatus":"text","textItemCount":1,"lineCount":1,"titleBlockText":"","textSample":""}],
+  "checklist": [{"id":"check-synthetic1","section":"Control","description":"Synthetic checklist","title":"Review example","prompt":"Verify","done":false,"note":""}],
+  "roadmap": [],
+  "content": {"scope":"Synthetic scope","basis":"","assumptions":"","exclusions":"","rfis":"","risks":"","rates":"","changes":""}
+}
